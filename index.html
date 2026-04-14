@@ -706,6 +706,51 @@ function generateAnswer(q) {
 }
 
 // ------
+// 立柱高度检验
+function answerColumnHeight(p) {
+  const h = p.colHeight;
+  const G = KB.general;
+
+  if (h === null) {
+    // 纯询问最大高度
+    return card('🏛️', '立柱高度规定',
+      verdict('info', 'ℹ️ 高度限制说明') +
+      dl([
+        ['最大高度', `<span class="danger">≤ 6m</span>`],
+        ['屋顶桁架立柱', '<span class="danger">不允许拼接</span>'],
+        ['6m < 立柱高度 < 8m', '需升级为 <span class="highlight">120×120×2.5 (S350GD)</span>'],
+        ['额外要求', '立柱高度 ≥ 4500mm 时，非桁架跨距需另增设腰梁'],
+      ]) +
+      notice('⚠️ 本标准中所有立柱高度上限为 6m，超过此高度需重新评估结构方案。')
+    );
+  }
+
+  const hM = h > 10 ? h / 1000 : h; // 自动处理mm/m
+  if (hM <= 6) {
+    return card('✅', '立柱高度合规检查',
+      verdict('pass', `✅ 合规 — 立柱高度 ${hM}m 符合要求`) +
+      dl([
+        ['输入高度', `${hM} m`],
+        ['标准限制', '≤ 6m'],
+        ['检验结论', '<span class="success">满足要求</span>'],
+        ['对应规格', hM <= 6 ? '100×80×2.0 (S420GD)' : '120×120×2.5 (S350GD)'],
+      ]) +
+      (hM >= 4.5 ? notice('⚠️ 立柱高度 ≥ 4500mm，需在非桁架跨距方向增设腰梁。') : '')
+    );
+  } else {
+    return card('❌', '立柱高度合规检查',
+      verdict('fail', `❌ 不合规 — 立柱高度 ${hM}m 超出限制`) +
+      dl([
+        ['输入高度', `<span class="danger">${hM} m</span>`],
+        ['标准限制', '<span class="danger">≤ 6m（强制）</span>'],
+        ['检验结论', '<span class="danger">不满足要求，需整改</span>'],
+      ]) +
+      notice('⛔ 屋顶桁架立柱最大高度为 6m，且不允许拼接。请调整设计方案，超高立柱不可用于本桁架体系。')
+    );
+  }
+}
+
+// ------
 // 【新增】跨度≤6m立柱位置专项回答
 function answerColumnPosition6m(p) {
   // 从间距表取现浇板所有行（span=6）
