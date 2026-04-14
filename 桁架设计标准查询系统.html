@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阳光棚3.0 桁架设计标准查询系统</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+    color: #202124;
+  }
+
+  /* ========== 首页搜索界面 ========== */
+  #home-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    transition: all 0.4s ease;
+  }
+
+  .logo-area {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-icon {
+    font-size: 56px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .logo-title {
+    font-size: 28px;
+    font-weight: 400;
+    color: #202124;
+    letter-spacing: 1px;
+  }
+
+  .logo-subtitle {
+    font-size: 13px;
+    color: #5f6368;
+    margin-top: 6px;
+  }
+
+  .search-box-wrapper {
+    width: 100%;
+    max-width: 620px;
+    position: relative;
+  }
+
+  .search-box {
+    width: 100%;
+    padding: 16px 56px 16px 24px;
+    font-size: 16px;
+    border: 1px solid #dfe1e5;
+    border-radius: 24px;
+    outline: none;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    color: #202124;
+    line-height: 1.5;
+  }
+
+  .search-box:focus {
+    box-shadow: 0 1px 6px rgba(32,33,36,0.28);
+    border-color: rgba(223,225,229,0);
+  }
+
+  .search-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4285f4;
+    font-size: 20px;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .search-btn:hover { color: #1a73e8; }
+
+  .quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+    justify-content: center;
+    max-width: 620px;
+  }
+
+  .tag {
+    padding: 7px 14px;
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 16px;
+    font-size: 13px;
+    color: #3c4043;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+  }
+
+  .tag:hover {
+    background: #f1f3f4;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* ========== 结果页界面 ========== */
+  #result-page {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .result-header {
+    background: #fff;
+    border-bottom: 1px solid #e8eaed;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-logo {
+    font-size: 22px;
+    color: #4285f4;
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .header-logo span { font-size: 14px; }
+
+  .result-search-box {
+    flex: 1;
+    max-width: 640px;
+    padding: 10px 46px 10px 18px;
+    font-size: 15px;
+    border: 1px solid #dfe1e5;
+    border-radius: 24px;
+    outline: none;
+    background: #f1f3f4;
+    transition: all 0.2s;
+  }
+
+  .result-search-box:focus {
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(32,33,36,0.28);
+    border-color: transparent;
+  }
+
+  .result-search-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 640px;
+  }
+
+  .result-search-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4285f4;
+    font-size: 18px;
+  }
+
+  .result-body {
+    padding: 24px 20px;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ========== 答案卡片 ========== */
+  .answer-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .card-icon { font-size: 22px; }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #202124;
+  }
+
+  .verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .verdict-pass  { background: #e6f4ea; color: #137333; }
+  .verdict-fail  { background: #fce8e6; color: #c5221f; }
+  .verdict-warn  { background: #fef9e7; color: #b06000; }
+  .verdict-info  { background: #e8f0fe; color: #1967d2; }
+
+  .detail-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .detail-list li {
+    padding: 7px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #f1f3f4;
+    display: flex;
+    gap: 8px;
+    line-height: 1.6;
+  }
+
+  .detail-list li:last-child { border-bottom: none; }
+  .detail-label { color: #5f6368; min-width: 90px; flex-shrink: 0; }
+  .detail-value { color: #202124; font-weight: 500; }
+
+  .highlight { color: #1a73e8; font-weight: 600; }
+  .danger    { color: #c5221f; font-weight: 600; }
+  .success   { color: #137333; font-weight: 600; }
+  .warning-text { color: #b06000; font-weight: 600; }
+
+  .notice-box {
+    background: #fff8e1;
+    border-left: 4px solid #f9a825;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #5d4037;
+    line-height: 1.7;
+  }
+
+  table.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  table.result-table th {
+    background: #f1f3f4;
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #3c4043;
+    border: 1px solid #e8eaed;
+  }
+
+  table.result-table td {
+    padding: 8px 12px;
+    border: 1px solid #e8eaed;
+    color: #202124;
+  }
+
+  table.result-table tr:hover td { background: #f8f9fa; }
+  table.result-table .best-row td { background: #e6f4ea; font-weight: 600; }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .chip {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    background: #e8f0fe;
+    color: #1967d2;
+    border: 1px solid #c5d8fe;
+  }
+
+  .chip.green { background: #e6f4ea; color: #137333; border-color: #b7dfba; }
+  .chip.red   { background: #fce8e6; color: #c5221f; border-color: #f5b8b4; }
+  .chip.yellow{ background: #fef9e7; color: #b06000; border-color: #fde68a; }
+
+  .no-result {
+    text-align: center;
+    padding: 40px 20px;
+    color: #5f6368;
+  }
+
+  .no-result .emoji { font-size: 48px; margin-bottom: 12px; }
+  .no-result p { font-size: 15px; }
+
+  .suggest-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    justify-content: center;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 30px;
+    color: #5f6368;
+    font-size: 14px;
+  }
+
+  .loading-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4285f4;
+    margin: 0 3px;
+    animation: bounce 1.2s infinite;
+  }
+  .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+    40% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .section-divider {
+    font-size: 12px;
+    color: #80868b;
+    padding: 8px 0 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid #dadce0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #3c4043;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .back-btn:hover { background: #f1f3f4; }
+</style>
+</head>
+<body>
+
+<!-- ===== 首页 ===== -->
+<div id="home-page">
+  <div class="logo-area">
+    <span class="logo-icon">🏗️</span>
+    <div class="logo-title">桁架设计标准查询</div>
+    <div class="logo-subtitle">阳光棚3.0 · 屋顶桁架通用设计图集 · IH-WHJ-001~012</div>
+  </div>
+
+  <div class="search-box-wrapper">
+    <input type="text" class="search-box" id="home-input"
+      placeholder="输入问题，例如：跨度7米用什么立柱？立柱高度5米是否符合要求？"
+      autocomplete="off" />
+    <button class="search-btn" onclick="doSearch()" title="查询">🔍</button>
+  </div>
+
+  <div class="quick-tags">
+    <div class="tag" onclick="fillAndSearch('桁架跨度不超过6m，能否不立柱在承重墙上')">跨度≤6m立柱位置</div>
+    <div class="tag" onclick="fillAndSearch('立柱最大高度是多少？')">立柱最大高度</div>
+    <div class="tag" onclick="fillAndSearch('跨度5米选哪种桁架？')">跨度5米选型</div>
+    <div class="tag" onclick="fillAndSearch('跨度7米用什么立柱规格？')">跨度7米立柱</div>
+    <div class="tag" onclick="fillAndSearch('Ⅲ类风压跨度6米檩条间距多少？')">Ⅲ类风压间距</div>
+    <div class="tag" onclick="fillAndSearch('立柱可以拼接吗？')">立柱拼接规则</div>
+    <div class="tag" onclick="fillAndSearch('膨胀螺栓规格要求')">膨胀螺栓要求</div>
+    <div class="tag" onclick="fillAndSearch('现浇板厚度要求')">现浇板厚度</div>
+    <div class="tag" onclick="fillAndSearch('螺栓距梁边距离要求')">螺栓边距要求</div>
+  </div>
+</div>
+
+<!-- ===== 结果页 ===== -->
+<div id="result-page">
+  <div class="result-header">
+    <div class="header-logo" onclick="backHome()">🏗️ <span>桁架标准查询</span></div>
+    <div class="result-search-wrapper">
+      <input type="text" class="result-search-box" id="result-input"
+        placeholder="重新输入问题..." autocomplete="off" />
+      <button class="result-search-btn" onclick="doSearchFromResult()">🔍</button>
+    </div>
+    <button class="back-btn" onclick="backHome()">← 首页</button>
+  </div>
+  <div class="result-body" id="result-body"></div>
+</div>
+
+<script>
+// =====================================================================
+//  知识库数据
+// =====================================================================
+const KB = {
+  // --- 通用规则 ---
+  general: {
+    buildingHeight:     { max: 18, unit: 'm', desc: '建筑高度必须 < 18m（立柱距地 ≤ 21m）' },
+    columnMaxHeight:    { max: 6,  unit: 'm', desc: '所有立柱高度不得超过 6m，屋顶桁架立柱不允许拼接' },
+    columnSplice:       false,
+    abdominalSplice:    false, // 腹杆、斜撑不允许拼接
+    spanSpliceMax:      1,     // 一跨内上弦/下弦/檩条/斜梁/水平支撑/腰梁仅允许拼接1次
+    slopeTypes:         ['5°单坡', '5°人字坡'],
+    concreteThickMin:   100,   // mm
+    boltSpec:           'M12×90 以上 304不锈钢膨胀螺栓',
+    baseplate:          '250×250×8（6孔底板），设加劲肋 -4×100×50',
+    weld:               '全部满焊，角焊缝焊脚尺寸 3mm，敲焊渣打磨平整后防腐',
+    noMixTruss:         '同一方阵不允许斜梁桁架与檩条桁架同时使用',
+    noCantilever:       '桁架立柱不允许落在挑梁和挑板上方',
+    mustBeam:           '桁架立柱底部楼板下方必须有梁或者墙，否则一律回购',
+    boltEdgeBeam:       50,    // mm 距梁边
+    boltEdgeSlab:       150,   // mm 距板边/墙边
+    h2Support:          '立柱高度≥4500mm时，非桁架跨距另增设腰梁',
+    horizSpacingMax:    2000,  // mm 水平支撑间距
+    horizSpacingNote:   '桁架下弦处水平支撑间距 < 2000mm',
+  },
+
+  // --- 构件材料规格 ---
+  materials: [
+    { name:'立柱（非桁架）',         spec:'100×80×2.0',   grade:'S420GD', cond:'立柱高度 ≤ 6m' },
+    { name:'立柱（桁架，跨度≤6m）',  spec:'100×80×2.0',   grade:'S420GD', cond:'桁架跨度 ≤ 6m' },
+    { name:'立柱（桁架，跨度>6m）',  spec:'120×120×2.5',  grade:'S350GD', cond:'桁架跨度 > 6m' },
+    { name:'立柱（高度6~8m）',        spec:'120×120×2.5',  grade:'S350GD', cond:'立柱高度 6~8m' },
+    { name:'斜梁',                    spec:'100×80×2.0',   grade:'S420GD', cond:'通用' },
+    { name:'檩条/腰梁',               spec:'70×40×1.8',    grade:'S350GD', cond:'通用' },
+    { name:'桁架上弦（斜梁/檩条）',   spec:'100×80×2.0',   grade:'S420GD', cond:'通用' },
+    { name:'桁架下弦',                spec:'70×40×1.8',    grade:'S350GD', cond:'通用' },
+    { name:'桁架腹杆',                spec:'40×40×2.0',    grade:'S350GD', cond:'通用' },
+    { name:'水平支撑/斜撑',           spec:'70×40×1.8',    grade:'S350GD', cond:'通用' },
+  ],
+
+  // --- 桁架规格参数 ---
+  trussSpecs: {
+    '6m-XL': {
+      name:'6米斜梁方向桁架', code:'HJ-XL-6', spanRange:'4m < L ≤ 6m',
+      components: {
+        '上弦杆':'100×80×2.0 (S420GD)', '下弦杆':'40×70×1.8 (S350GD)',
+        '腹杆':'40×40×2.0 (S350GD)', '斜撑':'40×70×1.8 (S350GD)',
+        '水平支撑':'40×70×1.8 (S350GD)', '立柱':'100×80×2.0 (S420GD)',
+        '底板':'250×250×8（6孔）'
+      },
+      notes:['沿桁架方向，柱脚每侧3颗螺栓','建筑高度≤18m','檩条间距≤1000mm']
+    },
+    '6m-LT': {
+      name:'6米檩条方向桁架', code:'HJ-LT-6', spanRange:'4m < L ≤ 6m',
+      components: {
+        '上弦杆':'100×80×2.0 (S420GD)', '下弦杆':'40×70×1.8 (S350GD)',
+        '腹杆':'40×40×2.0 (S350GD)', '斜撑':'40×70×1.8 (S350GD)',
+        '水平支撑':'40×70×1.8 (S350GD)', '立柱':'100×80×2.0 (S420GD)',
+        '小短柱':'100×80×2.0 (S420GD)', '底板':'250×250×8（6孔）'
+      },
+      notes:['沿桁架方向，柱脚每侧3颗螺栓','檩条方向每侧3个螺栓','≥100mm厚钢筋混凝土板']
+    },
+    '8m-XL': {
+      name:'8米斜梁方向桁架', code:'HJ-XL-8', spanRange:'6m < L ≤ 8m',
+      components: {
+        '上弦杆':'100×80×2.0 (S420GD)', '下弦杆':'70×40×1.8 (S350GD)',
+        '腹杆':'40×40×2.0 (S350GD)', '斜撑':'70×40×1.8 (S350GD)',
+        '水平支撑':'70×40×1.8 (S350GD)', '立柱':'120×120×2.5 (S350GD) ← 跨度>6m升级',
+        '底板':'250×250×8（6孔）'
+      },
+      notes:['柱脚每侧3~5颗螺栓（根据风压）','建筑高度≤18m','开通区域：Ⅰ类~Ⅳ类']
+    },
+    '8m-LT': {
+      name:'8米檩条方向桁架', code:'HJ-LT-8', spanRange:'6m < L ≤ 8m',
+      components: {
+        '上弦杆':'100×80×2.0 (S420GD)', '下弦杆':'70×40×1.8 (S350GD)',
+        '腹杆':'40×40×2.0 (S350GD)', '斜撑':'70×40×1.8 (S350GD)',
+        '水平支撑':'70×40×1.8 (S350GD)', '立柱':'120×120×2.5 (S350GD)',
+        '小短柱':'100×80×2.0 (S420GD)', '底板':'250×250×8（6孔）'
+      },
+      notes:['立柱高度≥4500mm时，非桁架跨距另增设腰梁','桁架下弦处水平支撑间距<2000mm']
+    },
+    '10m-XL': {
+      name:'10米斜梁方向桁架', code:'HJ-XL-10', spanRange:'8m < L ≤ 10m',
+      components: {
+        '上弦杆':'100×80×2.0 (S420GD)', '下弦杆':'70×40×1.8 (S350GD)',
+        '腹杆':'40×40×2.0 (S350GD)', '斜撑':'70×40×1.8 (S350GD)',
+        '水平支撑':'70×40×1.8 (S350GD)', '立柱':'120×120×2.5 (S350GD)',
+        '底板':'250×250×8（6孔）'
+      },
+      notes:['桁架立柱正下方必须有梁或者墙','施工前必须核对','开通区域：Ⅰ类、Ⅱ类、Ⅲ类']
+    },
+    '10m-LT': {
+      name:'10米檩条方向桁架', code:'HJ-LT-10', spanRange:'8m < L ≤ 10m',
+      components: {
+        '上弦杆':'100×80×2.0 (S420GD)', '下弦杆':'70×40×1.8 (S350GD)',
+        '腹杆':'40×40×2.0 (S350GD)', '斜撑':'70×40×1.8 (S350GD)',
+        '水平支撑':'70×40×1.8 (S350GD)', '立柱':'120×120×2.5 (S420GD)',
+        '小短柱':'100×80×2.0 (S420GD)', '底板':'250×250×8（6孔）'
+      },
+      notes:['桁架立柱正下方必须有梁或墙','檩条方向每侧3个螺栓','≥100mm厚钢筋混凝土板']
+    }
+  },
+
+  // --- 桁架间距数据表 ---
+  // 格式：{ span, spanLabel, windClass, position, spacingXL, spacingLT, heightNote }
+  // spacingXL：斜梁方向桁架 → 控制"檩条间距"
+  // spacingLT：檩条方向桁架 → 控制"斜梁间距"
+  spacingTable: [
+    // ---- 3.1 跨度≤6m（Ⅰ~Ⅵ类），立柱位置：梁/承重墙 ----
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅰ/Ⅱ', position:'梁/承重墙', spacingXL:3.6, spacingLT:3.6, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅲ',    position:'梁/承重墙', spacingXL:3.4, spacingLT:3.4, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅳ',    position:'梁/承重墙', spacingXL:3.3, spacingLT:3.3, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅴ/Ⅵ', position:'梁/承重墙', spacingXL:2.9, spacingLT:2.9, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅰ/Ⅱ', position:'梁/承重墙', spacingXL:3.5, spacingLT:3.5, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅲ',    position:'梁/承重墙', spacingXL:3.3, spacingLT:3.3, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅳ',    position:'梁/承重墙', spacingXL:3.2, spacingLT:3.2, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅴ/Ⅵ', position:'梁/承重墙', spacingXL:2.9, spacingLT:2.9, heightNote:'≤18m（立柱距地≤21m）' },
+    // ---- 3.1 跨度≤6m（Ⅰ~Ⅵ类），立柱位置：现浇板 ----
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅰ/Ⅱ', position:'现浇板', spacingXL:3.6, spacingLT:3.6, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅲ',    position:'现浇板', spacingXL:3.3, spacingLT:3.3, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅳ',    position:'现浇板', spacingXL:3.2, spacingLT:3.2, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'4m<L≤5m', windClass:'Ⅴ/Ⅵ', position:'现浇板', spacingXL:2.5, spacingLT:2.5, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅰ/Ⅱ', position:'现浇板', spacingXL:3.2, spacingLT:3.2, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅲ',    position:'现浇板', spacingXL:3.2, spacingLT:3.2, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅳ',    position:'现浇板', spacingXL:3.1, spacingLT:3.1, heightNote:'≤18m（立柱距地≤21m）' },
+    { span:6, spanLabel:'5m<L≤6m', windClass:'Ⅴ/Ⅵ', position:'现浇板', spacingXL:2.5, spacingLT:2.5, heightNote:'≤18m（立柱距地≤21m）' },
+    // ---- 3.2 跨度6~8m（Ⅰ~Ⅳ类） ----
+    { span:8, spanLabel:'6m<L≤8m', windClass:'Ⅰ/Ⅱ', position:'梁/承重墙', spacingXL:3.0, spacingLT:3.0, heightNote:'10m以下总高3.3m' },
+    { span:8, spanLabel:'6m<L≤8m', windClass:'Ⅲ',    position:'梁/承重墙', spacingXL:2.8, spacingLT:2.8, heightNote:'—' },
+    { span:8, spanLabel:'6m<L≤8m', windClass:'Ⅳ',    position:'梁/承重墙', spacingXL:2.7, spacingLT:2.7, heightNote:'—' },
+    { span:8, spanLabel:'6m<L≤8m', windClass:'Ⅰ/Ⅱ', position:'现浇板', spacingXL:2.7, spacingLT:2.7, heightNote:'10m以下总高2.9m' },
+    { span:8, spanLabel:'6m<L≤8m', windClass:'Ⅲ',    position:'现浇板', spacingXL:2.6, spacingLT:2.6, heightNote:'—' },
+    { span:8, spanLabel:'6m<L≤8m', windClass:'Ⅳ',    position:'现浇板', spacingXL:2.5, spacingLT:2.5, heightNote:'—' },
+    // ---- 3.3 跨度8~10m（Ⅰ~Ⅲ类，仅梁/承重墙） ----
+    { span:10, spanLabel:'8m<L≤10m', windClass:'Ⅰ/Ⅱ', position:'梁/承重墙', spacingXL:2.5, spacingLT:2.5, heightNote:'10m以下总高3.0m' },
+    { span:10, spanLabel:'8m<L≤10m', windClass:'Ⅲ',    position:'梁/承重墙', spacingXL:2.5, spacingLT:2.5, heightNote:'≤18m（立柱距地≤21m）' },
+  ]
+};
+
+// =====================================================================
+//  查询引擎
+// =====================================================================
+function parseQuery(q) {
+  const text = q.trim();
+  const lower = text.toLowerCase();
+  const num = (text.match(/(\d+\.?\d*)/g) || []).map(Number);
+
+  // 识别"斜梁方向"还是"檩条方向"
+  const isXL = /斜梁方向|斜梁桁架/.test(text);
+  const isLT = /檩条方向|檩条桁架/.test(text);
+
+  // 识别"是否可以立在现浇板（而非承重墙/梁）"的意图
+  // 触发条件：提到"跨度≤6m / 不超过6m / 6米以内" + "不立柱/不落在/能否/是否/承重墙/梁上"
+  const span = extractSpan(text, num);
+  const hasSmallSpan = (span !== null && span <= 6) ||
+    /跨度\s*(不超过|不大于|≤|<=|小于等于|小于|以内|6m以内|6米以内|不足)\s*6/i.test(text) ||
+    /6\s*(米|m)\s*(以内|不超|不大|及以下|跨度)/i.test(text);
+
+  // 是否含"不立柱/不落/承重墙/梁上"否定语境 → 问能否改立在现浇板
+  const askAboutSlab = /不.*立柱|不.*落.*梁|不.*承重墙|能否不.*梁|是否.*不.*梁|不落在.*梁|不.*立.*承重|现浇板.*立柱|立柱.*现浇板/i.test(text) ||
+    (/承重墙|落在梁|立柱.*梁|梁.*立柱/.test(text) && /能否|是否|可以|允许|不/.test(text));
+
+  // "位置判断"分支：跨度≤6m + 疑问是否可以不立在承重墙
+  const isColumnPosQuery = hasSmallSpan && askAboutSlab;
+
+  return {
+    raw: text,
+    lower,
+    nums: num,
+    hasSpan:    /跨度|跨距|span/i.test(text),
+    hasColumn:  /立柱|柱高|column/i.test(text),
+    hasSplice:  /拼接|splice/i.test(text),
+    hasWeld:    /焊接|焊缝|weld/i.test(text),
+    hasWind:    /风压|风区|wind/i.test(text),
+    hasSpacing: /间距|spacing/i.test(text),
+    hasSpec:    /规格|材质|材料|spec/i.test(text),
+    hasBolt:    /螺栓|bolt/i.test(text),
+    hasSlab:    /现浇板|混凝土板|楼板/i.test(text),
+    hasHeight:  /高度|建筑高度/i.test(text),
+    hasCheck:   /是否|能否|可以|允许|满足|符合/i.test(text),
+    hasSelect:  /选|推荐|方案|用什么|怎么选|哪种/i.test(text),
+    windClass:  extractWindClass(text),
+    span:       span,
+    colHeight:  extractColHeight(text, num),
+    position:   /现浇板/.test(text) ? '现浇板' : /梁|承重墙/.test(text) ? '梁/承重墙' : null,
+    isXL,       // 明确说"斜梁方向"
+    isLT,       // 明确说"檩条方向"
+    isColumnPosQuery, // 询问"≤6m是否可以立在现浇板"
+  };
+}
+
+function extractWindClass(text) {
+  const m = text.match(/[Ⅰ-Ⅵ一二三四五六]类|[IiⅠ]{1,2}类|Ⅳ|Ⅴ|Ⅵ/);
+  if (!m) return null;
+  const map = { 'Ⅰ':'Ⅰ/Ⅱ','Ⅱ':'Ⅰ/Ⅱ','Ⅲ':'Ⅲ','Ⅳ':'Ⅳ','Ⅴ':'Ⅴ/Ⅵ','Ⅵ':'Ⅴ/Ⅵ' };
+  const ch = m[0].replace('类','').trim();
+  return map[ch] || ch;
+}
+
+function extractSpan(text, nums) {
+  const m = text.match(/跨度\s*(\d+\.?\d*)\s*米?|(\d+\.?\d*)\s*米.*跨/);
+  if (m) return parseFloat(m[1] || m[2]);
+  if (/跨度|跨距/.test(text) && nums.length > 0) {
+    const candidates = nums.filter(n => n >= 1 && n <= 15);
+    if (candidates.length) return candidates[0];
+  }
+  return null;
+}
+
+function extractColHeight(text, nums) {
+  const m = text.match(/立柱\s*高度?\s*(\d+\.?\d*)\s*[米m]?|高度?\s*(\d+\.?\d*)\s*[米m]/);
+  if (m) return parseFloat(m[1] || m[2]);
+  if (/立柱.*高度?|高度?.*立柱/.test(text) && nums.length > 0) {
+    const candidates = nums.filter(n => n >= 1 && n <= 20);
+    if (candidates.length) return candidates[0];
+  }
+  return null;
+}
+
+// =====================================================================
+//  根据解析结果生成答案 HTML
+// =====================================================================
+function generateAnswer(q) {
+  const p = parseQuery(q);
+  const parts = [];
+
+  // ---- 0. 【优先】跨度≤6m是否可以不立在承重墙（立在现浇板）专项回答 ----
+  if (p.isColumnPosQuery) {
+    parts.push(answerColumnPosition6m(p));
+    return parts.join('');  // 直接返回，不再走其他分支
+  }
+
+  // ---- 1. 立柱高度检验 ----
+  if (p.hasColumn && (p.hasCheck || p.colHeight !== null || p.hasHeight)) {
+    parts.push(answerColumnHeight(p));
+  }
+
+  // ---- 2. 跨度选型 / 构件规格 ----
+  if (p.hasSpan && (p.hasSelect || p.hasSpec || p.span !== null)) {
+    parts.push(answerSpanSelect(p));
+  }
+
+  // ---- 3. 间距查询 ----
+  if (p.hasSpacing || (p.hasWind && p.windClass)) {
+    parts.push(answerSpacing(p));
+  }
+
+  // ---- 4. 拼接规则 ----
+  if (p.hasSplice) {
+    parts.push(answerSplice(p));
+  }
+
+  // ---- 5. 螺栓/现浇板要求 ----
+  if (p.hasBolt) parts.push(answerBolt());
+  if (p.hasSlab && !p.isColumnPosQuery) parts.push(answerSlab());
+
+  // ---- 6. 焊接要求 ----
+  if (p.hasWeld) parts.push(answerWeld());
+
+  // ---- 7. 立柱通用要求（不含高度查询） ----
+  if (p.hasColumn && !p.hasHeight && !p.colHeight && !p.hasSplice && parts.length === 0) {
+    parts.push(answerColumnGeneral());
+  }
+
+  // ---- 8. 材料规格汇总 ----
+  if (p.hasSpec && parts.length === 0) {
+    parts.push(answerMaterials());
+  }
+
+  // ---- 9. 没有匹配到具体条目 → "没有标准方案" ----
+  if (parts.length === 0) {
+    parts.push(answerNoStandard(p));
+  }
+
+  return parts.join('');
+}
+
+// ------
+// 【新增】跨度≤6m立柱位置专项回答
+function answerColumnPosition6m(p) {
+  // 从间距表取现浇板所有行（span=6）
+  const slabRows6 = KB.spacingTable.filter(r => r.span === 6 && r.position === '现浇板');
+
+  // 斜梁方向（spacingXL = 檩条间距）
+  const xlRows = slabRows6;
+  // 檩条方向（spacingLT = 斜梁间距）
+  const ltRows = slabRows6;
+
+  const tableXL = `
+    <table class="result-table" style="margin-top:10px">
+      <thead>
+        <tr>
+          <th>桁架跨度</th>
+          <th>Ⅰ/Ⅱ类风压<br>檩条间距</th>
+          <th>Ⅲ类风压<br>檩条间距</th>
+          <th>Ⅳ类风压<br>檩条间距</th>
+          <th>Ⅴ/Ⅵ类风压<br>檩条间距</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>4m &lt; L ≤ 5m</td>
+          <td style="color:#1a73e8;font-weight:600">3.6m</td>
+          <td style="color:#1a73e8;font-weight:600">3.3m</td>
+          <td style="color:#1a73e8;font-weight:600">3.2m</td>
+          <td style="color:#1a73e8;font-weight:600">2.5m</td>
+        </tr>
+        <tr>
+          <td>5m &lt; L ≤ 6m</td>
+          <td style="color:#1a73e8;font-weight:600">3.2m</td>
+          <td style="color:#1a73e8;font-weight:600">3.2m</td>
+          <td style="color:#1a73e8;font-weight:600">3.1m</td>
+          <td style="color:#1a73e8;font-weight:600">2.5m</td>
+        </tr>
+      </tbody>
+    </table>`;
+
+  const tableLT = `
+    <table class="result-table" style="margin-top:10px">
+      <thead>
+        <tr>
+          <th>桁架跨度</th>
+          <th>Ⅰ/Ⅱ类风压<br>斜梁间距</th>
+          <th>Ⅲ类风压<br>斜梁间距</th>
+          <th>Ⅳ类风压<br>斜梁间距</th>
+          <th>Ⅴ/Ⅵ类风压<br>斜梁间距</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>4m &lt; L ≤ 5m</td>
+          <td style="color:#1a73e8;font-weight:600">3.6m</td>
+          <td style="color:#1a73e8;font-weight:600">3.3m</td>
+          <td style="color:#1a73e8;font-weight:600">3.2m</td>
+          <td style="color:#1a73e8;font-weight:600">2.5m</td>
+        </tr>
+        <tr>
+          <td>5m &lt; L ≤ 6m</td>
+          <td style="color:#1a73e8;font-weight:600">3.2m</td>
+          <td style="color:#1a73e8;font-weight:600">3.2m</td>
+          <td style="color:#1a73e8;font-weight:600">3.1m</td>
+          <td style="color:#1a73e8;font-weight:600">2.5m</td>
+        </tr>
+      </tbody>
+    </table>`;
+
+  let html = verdict('pass', '✅ 可以 — 跨度 ≤ 6m 时，立柱允许立在现浇板上') +
+    `<div style="margin:14px 0 8px;font-size:14px;color:#202124;line-height:1.8">
+      <b>跨度不超过 6m 的桁架</b>，立柱位置允许选择以下两种方案之一：
+      <ul style="margin:8px 0 0 18px;list-style:disc;font-size:14px;line-height:2">
+        <li><span class="success">方案A（首选）：立柱位于梁或承重墙上</span>——无现浇板厚度要求限制</li>
+        <li><span class="highlight">方案B：立柱立于现浇板上</span>——需满足下方间距要求，且板厚 ≥ 100mm</li>
+      </ul>
+    </div>
+    <div class="notice-box" style="border-color:#34a853">
+      ⚠️ 注意：跨度 <b>&gt; 6m</b> 的桁架（8m、10m），立柱<b>必须</b>落在梁或承重墙上，<b>不允许</b>仅立于现浇板。
+    </div>`;
+
+  // 根据问题方向决定显示哪张表
+  if (p.isXL) {
+    html += `<div style="margin-top:18px;font-size:14px;font-weight:600;color:#3c4043">
+      📐 斜梁方向桁架（立柱在现浇板）— 檩条间距要求</div>` + tableXL;
+  } else if (p.isLT) {
+    html += `<div style="margin-top:18px;font-size:14px;font-weight:600;color:#3c4043">
+      📐 檩条方向桁架（立柱在现浇板）— 斜梁间距要求</div>` + tableLT;
+  } else {
+    // 两张都展示
+    html += `<div style="margin-top:18px;font-size:14px;font-weight:600;color:#3c4043">
+      📐 斜梁方向桁架（立柱在现浇板）— 檩条间距要求</div>` + tableXL +
+    `<div style="margin-top:18px;font-size:14px;font-weight:600;color:#3c4043">
+      📐 檩条方向桁架（立柱在现浇板）— 斜梁间距要求</div>` + tableLT;
+  }
+
+  html += notice(
+    '📌 说明：\n' +
+    '• 斜梁方向桁架跨度 ≤ 6m 时，控制的是 <b>檩条方向间距</b>（即垂直于斜梁方向的立柱间距）。\n' +
+    '• 檩条方向桁架跨度 ≤ 6m 时，控制的是 <b>斜梁方向间距</b>（即垂直于檩条方向的立柱间距）。\n' +
+    '• 同一方阵不允许斜梁桁架与檩条桁架混用。\n' +
+    '• 现浇板厚度要求：≥ 100mm 钢筋混凝土板。\n' +
+    '• 立柱不允许落在挑梁或挑板上方。'
+  );
+
+  return card('🏗️', '立柱位置查询：跨度 ≤ 6m 是否可立于现浇板', html);
+}
+  const h = p.colHeight;
+  const G = KB.general;
+
+  if (h === null) {
+    // 纯询问最大高度
+    return card('🏛️', '立柱高度规定',
+      verdict('info', 'ℹ️ 高度限制说明') +
+      dl([
+        ['最大高度', `<span class="danger">≤ 6m</span>`],
+        ['屋顶桁架立柱', '<span class="danger">不允许拼接</span>'],
+        ['6m < 立柱高度 < 8m', '需升级为 <span class="highlight">120×120×2.5 (S350GD)</span>'],
+        ['额外要求', '立柱高度 ≥ 4500mm 时，非桁架跨距需另增设腰梁'],
+      ]) +
+      notice('⚠️ 本标准中所有立柱高度上限为 6m，超过此高度需重新评估结构方案。')
+    );
+  }
+
+  const hM = h > 10 ? h / 1000 : h; // 自动处理mm/m
+  if (hM <= 6) {
+    return card('✅', '立柱高度合规检查',
+      verdict('pass', `✅ 合规 — 立柱高度 ${hM}m 符合要求`) +
+      dl([
+        ['输入高度', `${hM} m`],
+        ['标准限制', '≤ 6m'],
+        ['检验结论', '<span class="success">满足要求</span>'],
+        ['对应规格', hM <= 6 ? '100×80×2.0 (S420GD)' : '120×120×2.5 (S350GD)'],
+      ]) +
+      (hM >= 4.5 ? notice('⚠️ 立柱高度 ≥ 4500mm，需在非桁架跨距方向增设腰梁。') : '')
+    );
+  } else {
+    return card('❌', '立柱高度合规检查',
+      verdict('fail', `❌ 不合规 — 立柱高度 ${hM}m 超出限制`) +
+      dl([
+        ['输入高度', `<span class="danger">${hM} m</span>`],
+        ['标准限制', '<span class="danger">≤ 6m（强制）</span>'],
+        ['检验结论', '<span class="danger">不满足要求，需整改</span>'],
+      ]) +
+      notice('⛔ 屋顶桁架立柱最大高度为 6m，且不允许拼接。请调整设计方案，超高立柱不可用于本桁架体系。')
+    );
+  }
+}
+
+function answerSpanSelect(p) {
+  const s = p.span;
+  if (s === null) {
+    return card('📐', '桁架跨度选型',
+      `<p style="font-size:14px;color:#5f6368;margin-bottom:12px">请提供具体跨度数值，系统可为您匹配对应桁架型号和构件规格。</p>` +
+      `<p style="font-size:13px;color:#3c4043">可用跨度范围：</p>` +
+      `<div class="chip-row">
+        <span class="chip green">4m < L ≤ 6m → HJ-XL-6 / HJ-LT-6</span>
+        <span class="chip">6m < L ≤ 8m → HJ-XL-8 / HJ-LT-8</span>
+        <span class="chip yellow">8m < L ≤ 10m → HJ-XL-10 / HJ-LT-10</span>
+      </div>`
+    );
+  }
+
+  let key6, key8, key10, chosen;
+  if (s <= 4) {
+    return card('⚠️', '跨度超出范围',
+      verdict('warn', '⚠️ 跨度偏小，超出标准下限') +
+      notice('本桁架方案最小跨度为 4m，跨度 ≤ 4m 时请使用常规标准支架方案（非桁架体系）。')
+    );
+  } else if (s <= 6) {
+    chosen = ['6m-XL', '6m-LT'];
+  } else if (s <= 8) {
+    chosen = ['8m-XL', '8m-LT'];
+  } else if (s <= 10) {
+    chosen = ['10m-XL', '10m-LT'];
+  } else {
+    return card('❌', '跨度超出范围',
+      verdict('fail', `❌ 跨度 ${s}m 超出本标准最大范围（10m）`) +
+      notice('⛔ 本桁架图集仅适用于跨度 ≤ 10m 的情况。超过10m需单独出具结构计算书，请联系技术部门。')
+    );
+  }
+
+  const spec1 = KB.trussSpecs[chosen[0]];
+  const spec2 = KB.trussSpecs[chosen[1]];
+
+  let html = verdict('pass', `✅ 跨度 ${s}m — 推荐方案如下`);
+  html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">`;
+
+  [spec1, spec2].forEach(sp => {
+    html += `<div style="background:#f8f9fa;border-radius:8px;padding:14px;">
+      <div style="font-weight:600;color:#1a73e8;margin-bottom:8px">📋 ${sp.name}</div>
+      <div style="font-size:12px;color:#3c4043;margin-bottom:4px">图号：${sp.code}　范围：${sp.spanRange}</div>
+      <hr style="border:none;border-top:1px solid #e8eaed;margin:8px 0">
+      <ul style="list-style:none;padding:0;font-size:12px;color:#3c4043">
+        ${Object.entries(sp.components).map(([k,v]) => `<li style="padding:2px 0">• <b>${k}</b>：${v}</li>`).join('')}
+      </ul>
+      ${sp.notes.length ? `<div style="margin-top:8px;padding:8px;background:#fff8e1;border-radius:4px;font-size:12px;color:#5d4037">
+        ${sp.notes.map(n => `⚠️ ${n}`).join('<br>')}
+      </div>` : ''}
+    </div>`;
+  });
+  html += `</div>`;
+
+  const windNote = s > 8 ? '跨度>8m 仅适用于 Ⅰ类、Ⅱ类、Ⅲ类风压区域。' : s > 6 ? '跨度>6m 仅适用于 Ⅰ类~Ⅳ类风压区域。' : '跨度≤6m 适用于 Ⅰ类~Ⅵ类全部风压区域。';
+  html += notice(`📌 风压适用范围：${windNote}\n⚠️ 桁架立柱正下方必须有梁或者墙，施工前务必核查。`);
+
+  return card('📐', `跨度 ${s}m 桁架选型`, html);
+}
+
+function answerSpacing(p) {
+  let rows = KB.spacingTable;
+  const span = p.span, wind = p.windClass, pos = p.position;
+
+  if (span) {
+    if (span <= 6) rows = rows.filter(r => r.span === 6);
+    else if (span <= 8) rows = rows.filter(r => r.span === 8);
+    else if (span <= 10) rows = rows.filter(r => r.span === 10);
+  }
+  if (wind) rows = rows.filter(r => r.windClass === wind);
+  if (pos)  rows = rows.filter(r => r.position === pos);
+
+  if (rows.length === 0) {
+    return card('🔍', '没有标准方案',
+      verdict('warn', '⚠️ 没有标准方案 — 所查条件组合不在标准范围内') +
+      notice('请检查输入的风压等级和跨度是否在本标准范围内：\n• 跨度 ≤ 6m：Ⅰ~Ⅵ类风压，立柱可在梁/承重墙或现浇板上\n• 跨度 6~8m：Ⅰ~Ⅳ类风压，立柱在梁/承重墙或现浇板上\n• 跨度 8~10m：Ⅰ~Ⅲ类风压，立柱必须在梁/承重墙上')
+    );
+  }
+
+  // 判断展示方向标签
+  const dirXL = !p.isLT; // 默认或明确斜梁方向
+  const dirLT = !p.isXL; // 默认或明确檩条方向
+
+  // 精确单行：直接展示
+  if (rows.length === 1) {
+    const r = rows[0];
+    const html = verdict('info', `ℹ️ 间距查询结果`) +
+      dl([
+        ['跨度范围', r.spanLabel],
+        ['风压等级', r.windClass + ' 类'],
+        ['立柱位置', r.position],
+        ['斜梁方向桁架<br><small style="color:#80868b">（控制檩条间距）</small>', `<span class="highlight">${r.spacingXL} m</span>`],
+        ['檩条方向桁架<br><small style="color:#80868b">（控制斜梁间距）</small>', `<span class="highlight">${r.spacingLT} m</span>`],
+        ['房屋高度', r.heightNote],
+      ]) +
+      notice('📌 斜梁方向桁架的间距数值为"檩条间距"，檩条方向桁架的间距数值为"斜梁间距"，两者在本标准中数值相同。');
+    return card('📏', '桁架间距查询结果', html);
+  }
+
+  // 多行：展示表格
+  let html = `<table class="result-table">
+    <thead>
+      <tr>
+        <th>跨度</th>
+        <th>风压</th>
+        <th>立柱位置</th>
+        <th>斜梁方向<br><small>→ 檩条间距</small></th>
+        <th>檩条方向<br><small>→ 斜梁间距</small></th>
+        <th>房屋高度</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(r => `<tr>
+        <td>${r.spanLabel}</td>
+        <td>${r.windClass}</td>
+        <td>${r.position}</td>
+        <td style="font-weight:600;color:#1a73e8">${r.spacingXL} m</td>
+        <td style="font-weight:600;color:#137333">${r.spacingLT} m</td>
+        <td style="color:#80868b;font-size:12px">${r.heightNote}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+
+  html += notice('📌 "斜梁方向桁架"的间距为檩条间距；"檩条方向桁架"的间距为斜梁间距。\n⚠️ 10米桁架仅支持Ⅰ~Ⅲ类风压区，超出范围不适用。');
+  return card('📏', '桁架间距查询结果', html);
+}
+
+function answerSplice(p) {
+  const text = p.lower;
+  // 判断是否有具体构件
+  const isColumn  = /立柱/.test(text);
+  const isAbdom   = /腹杆|斜撑/.test(text);
+  const isChord   = /上弦|下弦|檩条|斜梁|水平支撑|腰梁/.test(text);
+
+  let html = '';
+
+  if (isColumn) {
+    html = verdict('fail', '❌ 屋顶桁架立柱 — 不允许拼接') +
+    dl([
+      ['构件', '屋顶桁架立柱'],
+      ['拼接规则', '<span class="danger">严禁拼接</span>'],
+      ['原因', '立柱高度≤6m，应整根使用'],
+    ]) +
+    notice('⛔ 屋顶桁架立柱必须整根使用，不允许拼接。任何拼接做法均不合规。');
+    return card('🔩', '立柱拼接规则', html);
+  }
+
+  if (isAbdom) {
+    html = verdict('fail', '❌ 腹杆/斜撑 — 不允许拼接') +
+    notice('⛔ 桁架腹杆和斜撑均不允许拼接，必须整根使用。');
+    return card('🔩', '腹杆/斜撑拼接规则', html);
+  }
+
+  // 通用拼接规则
+  html = verdict('info', 'ℹ️ 构件拼接规则汇总') +
+  `<table class="result-table">
+    <thead><tr><th>构件类型</th><th>拼接规则</th></tr></thead>
+    <tbody>
+      <tr><td>屋顶桁架立柱</td><td style="color:#c5221f;font-weight:600">❌ 不允许拼接</td></tr>
+      <tr><td>桁架腹杆</td><td style="color:#c5221f;font-weight:600">❌ 不允许拼接</td></tr>
+      <tr><td>斜撑</td><td style="color:#c5221f;font-weight:600">❌ 不允许拼接</td></tr>
+      <tr><td>桁架上弦</td><td style="color:#137333;font-weight:600">✅ 每跨仅允许拼接 1 次</td></tr>
+      <tr><td>桁架下弦</td><td style="color:#137333;font-weight:600">✅ 每跨仅允许拼接 1 次</td></tr>
+      <tr><td>檩条</td><td style="color:#137333;font-weight:600">✅ 每跨仅允许拼接 1 次</td></tr>
+      <tr><td>斜梁</td><td style="color:#137333;font-weight:600">✅ 每跨仅允许拼接 1 次</td></tr>
+      <tr><td>水平支撑</td><td style="color:#137333;font-weight:600">✅ 每跨仅允许拼接 1 次</td></tr>
+      <tr><td>腰梁</td><td style="color:#137333;font-weight:600">✅ 每跨仅允许拼接 1 次</td></tr>
+    </tbody>
+  </table>` +
+  notice('📌 "两根立柱之间为一跨"，拼接次数以跨为单位计算。');
+
+  return card('🔩', '构件拼接规则', html);
+}
+
+function answerBolt() {
+  const G = KB.general;
+  return card('🔧', '膨胀螺栓安装要求',
+    verdict('info', 'ℹ️ 螺栓规格与安装要求') +
+    dl([
+      ['螺栓规格', `<span class="highlight">> M12×90</span> 304不锈钢膨胀螺栓`],
+      ['匹配要求', '螺栓直径、底板孔径、螺栓垫片应相匹配'],
+      ['固定在梁上', `螺栓须距梁边 <span class="highlight">≥ 50mm</span>`],
+      ['固定在板/承重墙', `螺栓须距板边 <span class="highlight">≥ 150mm</span>`],
+      ['柱脚（≤6m桁架）', '沿桁架方向，柱脚每侧 3 颗螺栓'],
+      ['柱脚（8m桁架）', '柱脚每侧 3~5 颗螺栓（根据风压确定）'],
+    ]) +
+    notice('⚠️ 螺栓规格须严格执行，不允许用≤M12螺栓替代。底板型号：250×250×8（6孔），带加劲肋 -4×100×50。')
+  );
+}
+
+function answerSlab() {
+  return card('🏗️', '现浇板要求',
+    verdict('info', 'ℹ️ 现浇板（楼板）相关规定') +
+    dl([
+      ['最小板厚', `<span class="highlight">≥ 100mm</span> 钢筋混凝土板`],
+      ['桁架立柱落位', '立柱正下方 <span class="danger">必须有梁或者墙</span>'],
+      ['禁止落位', '<span class="danger">不允许落在挑梁、挑板上方</span>'],
+      ['螺栓距板边', `≥ 150mm`],
+    ]) +
+    notice('⛔ 桁架立柱底部楼板下方必须有梁或者墙，未按要求施工的一律回购。施工前务必核对结构图纸。')
+  );
+}
+
+function answerWeld() {
+  return card('🔥', '焊接要求',
+    verdict('info', 'ℹ️ 焊接工艺规定') +
+    dl([
+      ['焊接方式', '<span class="highlight">全部满焊</span>'],
+      ['角焊缝焊脚', '<span class="highlight">3mm</span>'],
+      ['焊后处理', '敲焊渣、打磨平整、做防腐处理'],
+      ['适用范围', '所有构件连接处以焊接为工艺时均须执行'],
+    ])
+  );
+}
+
+function answerColumnGeneral() {
+  return card('🏛️', '立柱通用规定',
+    verdict('info', 'ℹ️ 立柱使用规范') +
+    dl([
+      ['最大高度', `<span class="danger">≤ 6m</span>（不允许拼接）`],
+      ['高度6~8m', '需升级为 120×120×2.5 (S350GD)'],
+      ['跨度≤6m立柱', '100×80×2.0 (S420GD)'],
+      ['跨度>6m立柱', '120×120×2.5 (S350GD)'],
+      ['底板规格', '250×250×8（6孔），加劲肋 -4×100×50'],
+      ['落位要求', '<span class="danger">正下方必须有梁或墙，禁止落于挑梁/挑板</span>'],
+      ['腰梁要求', '立柱高度 ≥ 4500mm 时，非桁架跨距增设腰梁'],
+    ]) +
+    notice('⛔ 任何不符合落位要求的立柱安装，均须回购整改。')
+  );
+}
+
+function answerMaterials() {
+  let html = verdict('info', 'ℹ️ 全构件用料规格表') +
+    `<table class="result-table">
+      <thead>
+        <tr><th>构件名称</th><th>规格尺寸</th><th>材质等级</th><th>适用条件</th></tr>
+      </thead>
+      <tbody>
+        ${KB.materials.map(m => `<tr>
+          <td><b>${m.name}</b></td>
+          <td style="font-family:monospace;color:#1a73e8">${m.spec}</td>
+          <td>${m.grade}</td>
+          <td style="color:#5f6368;font-size:12px">${m.cond}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  return card('📋', '构件材料规格汇总', html);
+}
+
+function answerNoStandard(p) {
+  const suggestions = [
+    '立柱最大高度是多少？',
+    '跨度8米选哪个桁架型号？',
+    'Ⅳ类风压跨度6米的檩条间距',
+    '桁架跨度不超过6m，能否不立柱在承重墙上',
+    '腹杆可以拼接吗？',
+    '螺栓距梁边的最小距离',
+    '斜梁方向和檩条方向有什么区别？',
+    '桁架上弦规格是什么？',
+  ];
+  return `<div class="answer-card">
+    <div class="card-header">
+      <span class="card-icon">📭</span>
+      <span class="card-title">没有标准方案</span>
+    </div>
+    <div class="verdict verdict-warn">⚠️ 没有标准方案 — 未能在标准库中检索到与您问题直接对应的条目</div>
+    <p style="font-size:14px;color:#5f6368;margin:12px 0 8px">可能原因：问题描述不在标准范围内，或关键信息（跨度/风压/方向）未提供。</p>
+    <div class="suggest-list">
+      ${suggestions.map(s => `<div class="tag" onclick="fillResult('${s}')">${s}</div>`).join('')}
+    </div>
+  </div>
+  <div class="answer-card" style="margin-top:16px">
+    <div class="card-header"><span class="card-icon">💡</span><span class="card-title">提问建议</span></div>
+    <ul class="detail-list">
+      <li><span class="detail-label">立柱位置</span><span class="detail-value">如"跨度6m能否立在现浇板"、"不立柱在承重墙上"</span></li>
+      <li><span class="detail-label">跨度查询</span><span class="detail-value">说明跨度数值，如"跨度7米"</span></li>
+      <li><span class="detail-label">高度检验</span><span class="detail-value">说明具体高度，如"立柱高度5.5米是否合规"</span></li>
+      <li><span class="detail-label">间距查询</span><span class="detail-value">说明风压等级+跨度，如"Ⅲ类风压8米桁架间距"</span></li>
+      <li><span class="detail-label">材料查询</span><span class="detail-value">说明构件名称，如"桁架下弦规格"</span></li>
+    </ul>
+  </div>`;
+}
+
+// ---- 小工具函数 ----
+function card(icon, title, content) {
+  return `<div class="answer-card">
+    <div class="card-header">
+      <span class="card-icon">${icon}</span>
+      <span class="card-title">${title}</span>
+    </div>
+    ${content}
+  </div>`;
+}
+
+function verdict(type, text) {
+  return `<div class="verdict verdict-${type}">${text}</div>`;
+}
+
+function dl(rows) {
+  return `<ul class="detail-list">${rows.map(([l,v]) => `<li><span class="detail-label">${l}</span><span class="detail-value">${v}</span></li>`).join('')}</ul>`;
+}
+
+function notice(text) {
+  return `<div class="notice-box">${text.replace(/\n/g, '<br>')}</div>`;
+}
+
+// =====================================================================
+//  UI 交互
+// =====================================================================
+function doSearch() {
+  const q = document.getElementById('home-input').value.trim();
+  if (!q) return;
+  showResult(q);
+}
+
+function doSearchFromResult() {
+  const q = document.getElementById('result-input').value.trim();
+  if (!q) return;
+  showResult(q);
+}
+
+function fillAndSearch(q) {
+  document.getElementById('home-input').value = q;
+  showResult(q);
+}
+
+function fillResult(q) {
+  document.getElementById('result-input').value = q;
+  showResult(q);
+}
+
+function showResult(q) {
+  document.getElementById('home-page').style.display = 'none';
+  const rp = document.getElementById('result-page');
+  rp.style.display = 'flex';
+  document.getElementById('result-input').value = q;
+
+  const body = document.getElementById('result-body');
+  // 显示加载
+  body.innerHTML = `<div class="loading">
+    <span class="loading-dot"></span>
+    <span class="loading-dot"></span>
+    <span class="loading-dot"></span>
+    <span style="margin-left:8px">正在查询标准库…</span>
+  </div>`;
+
+  setTimeout(() => {
+    body.innerHTML = `
+      <div class="section-divider">查询结果 — "${q}"</div>
+      ${generateAnswer(q)}
+    `;
+  }, 380);
+}
+
+function backHome() {
+  document.getElementById('result-page').style.display = 'none';
+  document.getElementById('home-page').style.display = 'flex';
+  document.getElementById('home-input').value = '';
+}
+
+// ---- 回车触发 ----
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const rp = document.getElementById('result-page');
+    if (rp.style.display === 'flex') {
+      doSearchFromResult();
+    } else {
+      doSearch();
+    }
+  }
+});
+</script>
+</body>
+</html>
