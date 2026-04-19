@@ -45,7 +45,7 @@
         <div class="form-group"><label>城市</label><select id="city" onchange="cascadeUpdate('city')"><option value="">请选择</option></select></div>
         <div class="form-group"><label>区县</label><select id="district" onchange="cascadeUpdate('district')"><option value="">请选择</option></select></div>
         <div class="form-group"><label>容配比 (自动锁定)</label><select id="ratio" disabled><option value="1.2倍(正常)">1.2倍 (正常超配)</option><option value="1.1倍">1.1倍 (轻度超配)</option><option value="1倍">1倍 (不超配)</option></select></div>
-        <div class="form-group"><label>组件系列</label><select id="series"><option value="NEG21_715">NEG21 (715W~720W)</option><option value="NEG21_730">NEG21 (730W~740W)</option><option value="NEG22_800">NEG22 (790W~800W)</option></select></div>
+        <div class="form-group"><label>组件系列</label><select id="series"><option value="">请先选择地区</option></select></div>
         <div class="form-group"><label>组件数量 (片)</label><input type="number" id="count" placeholder="请输入整数" min="10" max="330"></div>
     </div>
     <button class="btn-primary" onclick="queryMatch()">智能匹配查询</button>
@@ -433,6 +433,25 @@ NEG21_730:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,16],inv:"10",box:
 NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:25},{r:[16,18],inv:"12",box:25},{r:[19,22],inv:"15",box:25},{r:[23,25],inv:"17",box:25},{r:[26,30],inv:"20",box:25},{r:[31,37],inv:"25",box:30},{r:[38,45],inv:"30",box:50},{r:[46,49],inv:"33",box:50},{r:[50,54],inv:"36",box:50},{r:[55,60],inv:"40",box:50},{r:[61,75],inv:"50",box:50},{r:[76,90],inv:"30+30",box:100},{r:[91,105],inv:"30+40",box:100},{r:[106,120],inv:"40+40",box:100},{r:[121,135],inv:"40+50",box:100},{r:[136,150],inv:"50+50",box:100},{r:[151,165],inv:"30+30+50",box:150},{r:[166,180],inv:"40+40+40",box:150},{r:[181,195],inv:"40+40+50",box:150},{r:[196,210],inv:"40+50+50",box:150},{r:[211,225],inv:"50+50+50",box:150},{r:[226,240],inv:"40+40+40+40",box:200},{r:[241,250],inv:"40+40+40+50",box:200}],"1.1倍":[{r:[10,10],inv:"8",box:25},{r:[11,12],inv:"10",box:25},{r:[13,15],inv:"12",box:25},{r:[16,18],inv:"15",box:25},{r:[19,21],inv:"17",box:25},{r:[22,25],inv:"20",box:25},{r:[26,30],inv:"25",box:25},{r:[31,31],inv:"25",box:30},{r:[32,37],inv:"30",box:30},{r:[38,41],inv:"33",box:50},{r:[42,45],inv:"36",box:50},{r:[46,50],inv:"40",box:50},{r:[51,62],inv:"50",box:50},{r:[63,66],inv:"20+33",box:100},{r:[67,70],inv:"20+36",box:100},{r:[71,75],inv:"30+30",box:100},{r:[76,78],inv:"30+33",box:100},{r:[79,82],inv:"30+36",box:100},{r:[83,87],inv:"30+40",box:100},{r:[88,91],inv:"33+40",box:100},{r:[92,95],inv:"36+40",box:100},{r:[96,100],inv:"40+40",box:100},{r:[101,103],inv:"33+50",box:100},{r:[104,107],inv:"36+50",box:100},{r:[108,112],inv:"40+50",box:100},{r:[113,125],inv:"50+50",box:100},{r:[126,137],inv:"30+30+50",box:150},{r:[138,141],inv:"30+33+50",box:150},{r:[142,145],inv:"30+36+50",box:150},{r:[146,150],inv:"40+40+40",box:150},{r:[151,162],inv:"40+40+50",box:150},{r:[163,175],inv:"40+50+50",box:150},{r:[176,187],inv:"50+50+50",box:150},{r:[188,200],inv:"40+40+40+40",box:200},{r:[201,212],inv:"40+40+40+50",box:200},{r:[213,250],inv:"40+50+50+50",box:200}],"1倍":[{r:[10,10],inv:"8",box:25},{r:[11,12],inv:"10",box:25},{r:[13,15],inv:"12",box:25},{r:[16,18],inv:"15",box:25},{r:[19,21],inv:"17",box:25},{r:[22,25],inv:"20",box:25},{r:[26,30],inv:"25",box:25},{r:[31,31],inv:"25",box:30},{r:[32,37],inv:"30",box:30},{r:[38,41],inv:"33",box:50},{r:[42,45],inv:"36",box:50},{r:[46,50],inv:"40",box:50},{r:[51,62],inv:"50",box:50},{r:[63,66],inv:"20+33",box:100},{r:[67,70],inv:"20+36",box:100},{r:[71,75],inv:"30+30",box:100},{r:[76,78],inv:"30+33",box:100},{r:[79,82],inv:"30+36",box:100},{r:[83,87],inv:"30+40",box:100},{r:[88,91],inv:"33+40",box:100},{r:[92,95],inv:"36+40",box:100},{r:[96,100],inv:"40+40",box:100},{r:[101,103],inv:"33+50",box:100},{r:[104,107],inv:"36+50",box:100},{r:[108,112],inv:"40+50",box:100},{r:[113,125],inv:"50+50",box:100},{r:[126,137],inv:"30+30+50",box:150},{r:[138,141],inv:"30+33+50",box:150},{r:[142,145],inv:"30+36+50",box:150},{r:[146,150],inv:"40+40+40",box:150},{r:[151,162],inv:"40+40+50",box:150},{r:[163,175],inv:"40+50+50",box:150},{r:[176,187],inv:"50+50+50",box:150},{r:[188,200],inv:"40+40+40+40",box:200},{r:[201,212],inv:"40+40+40+50",box:200},{r:[213,237],inv:"40+50+50+50",box:200},{r:[238,250],inv:"50+50+50+50",box:200}]}
 };
 
+// 湖南专用730配置（新增42kW/45kW/47kW挡位）
+const HUNAN_DB = {
+    "1.2倍(正常)": [
+        { r: [65, 68], inv: "17+25", box: 50 },
+        { r: [69, 72], inv: "20+25", box: 50 },
+        { r: [73, 76], inv: "17+30", box: 50 }
+    ],
+    "1.1倍": [
+        { r: [60, 62], inv: "17+25", box: 50 },
+        { r: [63, 66], inv: "20+25", box: 50 },
+        { r: [67, 69], inv: "17+30", box: 50 }
+    ],
+    "1倍": [
+        { r: [55, 56], inv: "17+25", box: 50 },
+        { r: [57, 60], inv: "20+25", box: 50 },
+        { r: [61, 63], inv: "17+30", box: 50 }
+    ]
+};
+
 // ================= 3. 线缆阶梯表 (严格对照Excel) =================
 const CABLE_THRESHOLDS = [
     { limit: 20, cu: "3×10+2×6 mm²", al: "3×16+1×10 mm²" },
@@ -455,10 +474,16 @@ function lookupCable(power, type) {
 // ================= UI 与交互逻辑 =================
 function initCascade(){const p=document.getElementById('province');Object.keys(PROVINCE_CITY_DISTRICT).sort().forEach(x=>p.add(new Option(x,x)));cascadeUpdate('init');}
 function cascadeUpdate(lv){
-    const pSel=document.getElementById('province'),cSel=document.getElementById('city'),dSel=document.getElementById('district');
+    const pSel=document.getElementById('province'),cSel=document.getElementById('city'),dSel=document.getElementById('district'), sSel=document.getElementById('series');
     const p=pSel.value, c=cSel.value;
     if(lv==='province'||lv==='init'){cSel.innerHTML='<option value="">请选择</option>';dSel.innerHTML='<option value="">请选择</option>';if(p&&PROVINCE_CITY_DISTRICT[p])Object.keys(PROVINCE_CITY_DISTRICT[p]).sort().forEach(x=>cSel.add(new Option(x,x)));}
     if(lv==='city'||lv==='province'){dSel.innerHTML='<option value="">请选择</option>';if(p&&c&&PROVINCE_CITY_DISTRICT[p]?.[c])PROVINCE_CITY_DISTRICT[p][c].sort().forEach(x=>dSel.add(new Option(x,x)));}
+    // 湖南地区只显示730系列
+    if(p === '湖南省'){
+        sSel.innerHTML = '<option value="NEG21_730">NEG21 (730W~740W)</option>';
+    } else if(lv === 'province' || lv === 'init'){
+        sSel.innerHTML = '<option value="NEG21_715">NEG21 (715W~720W)</option><option value="NEG21_730">NEG21 (730W~740W)</option><option value="NEG22_800">NEG22 (790W~800W)</option>';
+    }
     if(lv==='district'||lv==='city') applyRegionRule();
 }
 function applyRegionRule(){
@@ -474,15 +499,26 @@ function updateSeries(){}
 function queryMatch(){
     const series=document.getElementById('series').value, ratio=document.getElementById('ratio').value;
     const count=parseInt(document.getElementById('count').value);
-    const mb=document.getElementById('msgBox'), rp=document.getElementById('resultPanel'), 
+    const p=document.getElementById('province').value;
+    const mb=document.getElementById('msgBox'), rp=document.getElementById('resultPanel'),
           gn=document.getElementById('gridNote'), wm=document.getElementById('warningMsg');
-    
+
     mb.style.display='none'; rp.style.display='none'; gn.style.display='none'; wm.style.display='none';
     if(!count||count<10||count>330){mb.textContent="⚠️ 请输入有效数量（10 ~ 330 片）";mb.style.display='block';return;}
-    
-    const table=DB[series][ratio];
-    let match=null;
-    for(let row of table) if(count>=row.r[0]&&count<=row.r[1]){match=row;break;}
+
+    // 湖南地区优先查询专用配置
+    let table, match=null;
+    if(p === '湖南省' && HUNAN_DB[ratio]){
+        for(let row of HUNAN_DB[ratio]) if(count>=row.r[0]&&count<=row.r[1]){match=row;break;}
+    }
+    // 未命中则回退到标准730配置
+    if(!match && series === 'NEG21_730'){
+        for(let row of DB.NEG21_730[ratio]) if(count>=row.r[0]&&count<=row.r[1]){match=row;break;}
+    }
+    // 其他系列
+    if(!match && DB[series] && DB[series][ratio]){
+        for(let row of DB[series][ratio]) if(count>=row.r[0]&&count<=row.r[1]){match=row;break;}
+    }
     if(!match){mb.textContent="❌ 未找到匹配项，请核对数量或联系技术支持。";mb.style.display='block';return;}
 
     const invPowers = match.inv.split('+').map(Number);
@@ -506,7 +542,7 @@ function queryMatch(){
         document.getElementById('resAl').textContent = alLine;
     }
 
-    const p=document.getElementById('province').value, c=document.getElementById('city').value, d=document.getElementById('district').value;
+    const c=document.getElementById('city').value, d=document.getElementById('district').value;
     const regionRule=REGION_DB[`${p}-${c}-${d}`];
     if(regionRule?.b && regionRule.b !== "标准"){
         gn.textContent = "备注：" + regionRule.b;
