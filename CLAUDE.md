@@ -1,36 +1,36 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+此文件为 Claude Code (claude.ai/code) 在本项目中工作时提供指导。
 
-## Project Overview
+## 项目简介
 
-A pure frontend web tool for photovoltaic (PV) system component matching - queries inverter, junction box, and cable specifications based on region, module series, and quantity.
+一个纯前端的光伏系统组件匹配工具，用于根据地区、组件系列和数量查询逆变器、并网箱及线缆规格。
 
-## Commands
+## 命令
 
-No build or test commands needed. This is a single HTML file project.
+无需构建或测试命令。这是一个单 HTML 文件项目。
 
-- Development: Open `index.html` directly in browser
-- Deploy: Push to GitHub, can be served via GitHub Pages
+- 开发：直接在浏览器中打开 `index.html`
+- 部署：推送到 GitHub，可通过 GitHub Pages 托管
 
-## Architecture
+## 架构
 
-Single-file application (`index.html`) containing:
+单文件应用 (`index.html`)，包含：
 
-- **CSS**: Responsive design with CSS variables, mobile-first grid layout
-- **HTML**: Form with 6 inputs (province/city/district dropdowns, ratio, series, module count)
-- **JavaScript**:
-  - `REGION_DB`: Regional configuration database mapping China administrative regions to inverter/box specs
-  - `INV_DB`: Inverter specification lookup table
-  - `cascadeUpdate()`: Handles 3-level dropdown cascade (province → city → district)
-  - `queryMatch()`: Core matching logic - calculates inverter, copper wire, junction box, aluminum wire based on inputs
-  - Data embedded as JS objects, no external dependencies
+- **CSS**：响应式设计，使用 CSS 变量，移动端优先的网格布局
+- **HTML**：表单，包含 6 个输入项（省份/城市/区县下拉框、容配比、组件系列、组件数量）
+- **JavaScript**：
+  - `REGION_DB`：地区配置数据库，映射中国行政区划到逆变器/并网箱规格
+  - `INV_DB`：逆变器规格查询表
+  - `cascadeUpdate()`：处理三级下拉框联动（省份 → 城市 → 区县）
+  - `queryMatch()`：核心匹配逻辑 - 根据输入计算逆变器、铜线、并网箱、铝线规格
+  - 数据以 JS 对象形式嵌入，无外部依赖
 
-## Key Data Structures
+## 关键数据结构
 
 - `REGION_DB`: `{ "省份-城市-区县": { b: "并网箱配置", r: "容配比要求" } }`
-- `INV_DB`: Module series → power → count → inverter model mapping
+- `INV_DB`: 组件系列 → 功率 → 数量 → 逆变器型号映射
 
-## Git Workflow
+## Git 工作流
 
-Use SSH URL: `git@github.com:Ricardo-9877/pv-tool.git`
+使用 SSH 方式：`git@github.com:Ricardo-9877/pv-tool.git`
