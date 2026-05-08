@@ -132,9 +132,14 @@
 
   function mapRegionRatio(val) {
     if (!val) return RATIO_NORMAL;
-    if (val.includes('1.2')) return RATIO_NORMAL;
-    if (val.includes('1.1')) return RATIO_LIGHT;
-    if (val === RATIO_NONE || val === '1') return RATIO_NONE;
+    // 处理 "不超配1" / "不超配1.1" 等文本格式
+    const m = typeof val === 'string' && val.match(/(\d+(?:\.\d+)?)/);
+    if (m) {
+      const num = parseFloat(m[1]);
+      if (num >= 1.2) return RATIO_NORMAL;
+      if (num >= 1.1) return RATIO_LIGHT;
+      if (num >= 1) return RATIO_NONE;
+    }
     return RATIO_NORMAL;
   }
 
