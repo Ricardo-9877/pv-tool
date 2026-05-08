@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光伏组件-逆变器及线缆匹配查询</title>
+    <style>
+        :root { --primary:#1677FF; --primary-hover:#0958D9; --primary-light:rgba(22,119,255,0.08); --bg-page:#F5F7FA; --bg-card:#FFF; --text-primary:#1D2129; --text-secondary:#86909C; --border:#E5E6EB; --warn-bg:#FFF7E6; --warn-border:#FFD591; --warn-text:#D48806; --info-bg:#E6F4FF; --info-border:#91CAFF; --info-text:#003EB3; --shadow:0 4px 16px rgba(0,0,0,0.06); --radius:12px; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg-page); color:var(--text-primary); line-height:1.5; min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:24px 16px; }
+        .container { width:100%; max-width:960px; background:var(--bg-card); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px; margin-top:10px; }
+        .header { text-align:center; margin-bottom:24px; }
+        .header h1 { font-size:24px; font-weight:600; margin-bottom:4px; background:linear-gradient(90deg,#1677FF,#36BFFA); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        .header .subtitle { font-size:14px; color:var(--text-secondary); font-weight:500; letter-spacing:1px; word-break:break-word; }
+        .input-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:20px; }
+        .form-group { position:relative; }
+        .form-group label { display:block; font-size:13px; color:var(--text-secondary); margin-bottom:6px; font-weight:500; }
+        select, input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:#FAFAFA; transition:all 0.2s ease; color:var(--text-primary); }
+        select:focus, input:focus { outline:none; border-color:var(--primary); background:#FFF; box-shadow:0 0 0 3px var(--primary-light); }
+        select:disabled { background:#F5F7FA; color:var(--text-secondary); cursor:not-allowed; border-color:#E5E6EB; }
+        .btn-primary { width:100%; padding:11px; background:var(--primary); color:#FFF; border:none; border-radius:8px; font-size:15px; font-weight:500; cursor:pointer; transition:all 0.2s ease; margin-bottom:20px; }
+        .btn-primary:hover { background:var(--primary-hover); transform:translateY(-1px); }
+        .btn-primary:active { transform:translateY(0); opacity:0.85; }
+        .btn-primary.success { background:#52C41A; }
+        .result-panel { display:none; animation:fadeIn 0.3s ease; margin-bottom:20px; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+        .result-header { font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:12px; padding-left:4px; border-left:4px solid var(--primary); display:flex; align-items:center; }
+        .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .result-box { background:#F9FAFB; border:1px solid var(--border); border-radius:8px; padding:16px; display:flex; flex-direction:column; }
+        .box-label { font-size:12px; color:var(--text-secondary); margin-bottom:8px; font-weight:500; }
+        .box-value { font-size:14px; font-weight:500; color:var(--primary); line-height:1.4; white-space:pre-line; }
+        .note-section { margin-top:12px; padding:12px 16px; background:#F9FAFB; border:1px dashed var(--border); border-radius:8px; font-size:13px; color:var(--text-primary); display:none; }
+        .warning-msg { margin-top:12px; padding:12px 16px; background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:8px; font-size:13px; color:var(--warn-text); display:none; align-items:center; gap:8px; font-weight:500; }
+        .warning-msg::before { content:"⚠️"; font-size:16px; }
+        .rules-panel { margin-top:20px; border:1px solid var(--info-border); background:var(--info-bg); border-radius:8px; padding:16px; }
+        .rules-title { font-size:14px; font-weight:600; color:var(--info-text); margin-bottom:8px; }
+        .rules-content { font-size:13px; color:var(--info-text); line-height:1.6; }
+        .rules-content ol { padding-left:18px; margin:6px 0; }
+        .rules-content li { margin-bottom:4px; }
+        @media(max-width:768px) { .input-grid { grid-template-columns:1fr 1fr; } .input-grid .form-group:nth-child(3), .input-grid .form-group:nth-child(6) { grid-column:span 2; } .result-grid { grid-template-columns:1fr; } }
+        #msgBox { text-align:center; color:#CF1322; background:#FFF1F0; border:1px solid #FFA39E; border-radius:8px; padding:10px 16px; display:none; margin-bottom:12px; font-size:14px; font-weight:500; position:relative; }
+        #msgBox .msg-close { position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:14px; color:#CF1322; background:none; border:none; line-height:1; padding:4px; }
+        .form-group.has-error select,
+        .form-group.has-error input { border-color:#CF1322; background:#FFF1F0; box-shadow:0 0 0 3px rgba(207,19,34,0.08); animation:shake 0.3s ease; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-4px)} 40%{transform:translateX(4px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+        /* ===== 级联过渡动效 ===== */
+        .cascading select { opacity:0.5; transition:opacity 0.2s; }
+        /* ===== 查询按钮加载态 ===== */
+        .btn-primary.loading { pointer-events:none; opacity:0.7; }
+        /* ===== 容配比 disabled 对比度 ===== */
+        select:disabled { color:#4E5969; opacity:0.7; }
+        .ratio-hint { font-size:12px; color:var(--text-secondary); margin-top:4px; line-height:1.3; }
+        .result-copy-btn { font-size:12px; color:var(--primary); cursor:pointer; background:none; border:1px solid var(--primary); border-radius:4px; padding:2px 8px; margin-left:auto; transition:all 0.15s; }
+        .result-copy-btn:hover { background:var(--primary-light); }
+        .result-copy-btn.copied { color:#52C41A; border-color:#52C41A; }
+        .cable-line { display:block; }
+        .cable-label { color:var(--text-secondary); font-weight:400; }
+        @media(prefers-reduced-motion:reduce){ .result-panel{animation:none;} .cascading select{opacity:1;transition:none;} }
+        /* ===== 小屏断点 ===== */
+        @media(max-width:480px) { body { padding:12px 8px; } .container { padding:16px; } .header h1 { font-size:20px; } .input-grid { grid-template-columns:1fr; gap:12px; } .input-grid .form-group:nth-child(3), .input-grid .form-group:nth-child(6) { grid-column:span 1; } .result-grid { grid-template-columns:1fr; } .form-group label { font-size:14px; } select, input { font-size:16px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header"><h1>组件-逆变器及线缆匹配查询</h1><div class="subtitle">支持NEG 715-800W组件，有疑问处请联系南部解决方案部段林钢</div></div>
+    <div class="input-grid">
+        <div class="form-group"><label>省份</label><select id="province"><option value="">请选择省份</option></select></div>
+        <div class="form-group"><label>城市</label><select id="city"><option value="">请选择</option></select></div>
+        <div class="form-group"><label>区县</label><select id="district"><option value="">请选择</option></select></div>
+        <div class="form-group"><label>容配比 (自动锁定)</label><select id="ratio" disabled></select><div class="ratio-hint">选择区县后自动匹配</div></div>
+        <div class="form-group"><label>组件系列</label><select id="series"><option value="">请先选择地区</option></select></div>
+        <div class="form-group"><label for="count">组件数量 (片)</label><input type="number" id="count" placeholder="请输入整数" min="10" max="330" step="1" aria-describedby="countHint"><div id="countHint" style="display:none;">有效范围 10 到 330 片</div></div>
+    </div>
+    <button class="btn-primary" id="queryBtn">智能匹配查询</button>
+    <div id="msgBox" role="alert"><span id="msgText"></span><span class="msg-close">×</span></div>
+    <div id="resultPanel" class="result-panel" aria-live="polite">
+        <div class="result-header">匹配结果清单<button class="result-copy-btn" id="copyBtn">复制结果</button></div>
+        <div class="result-grid">
+            <div class="result-box"><div class="box-label">逆变器配置</div><div class="box-value" id="resInv">-</div></div>
+            <div class="result-box"><div class="box-label">逆变器交流铜线</div><div class="box-value" id="resCu">-</div></div>
+            <div class="result-box"><div class="box-label">并网箱配置</div><div class="box-value" id="resBox">-</div></div>
+            <div class="result-box"><div class="box-label">并网箱交流铝线</div><div class="box-value" id="resAl">-</div></div>
+        </div>
+        <div id="gridNote" class="note-section"></div>
+        <div id="warningMsg" class="warning-msg"><span>组件总功率超过 100kW 时，并网箱需自行采购，自采元器件需符合公司白名单要求</span></div>
+    </div>
+    <div class="rules-panel">
+        <div class="rules-title">选型与施工规范</div>
+        <div class="rules-content">
+            <ol>
+                <li>逆变器输出线必须使用铜线 (ZR-YJV-0.6/1kV)。</li>
+                <li>交流电缆长度 ≤50m，线径参考表格标准。</li>
+                <li>50m ＜ 长度 ≤100m，线径比规定 <b>大一号</b>。</li>
+                <li>100m ＜ 长度 ≤150m，线径比规定 <b>大二号</b>。</li>
+                <li>长度 ＞150m，请联系交付人员处理。</li>
+            </ol>
+            <p style="margin-top:8px;font-weight:500;">注意：并网时电气负责人务必在场，确保线缆线径符合要求，进出口有效封堵，铝出线需使用铜铝端子。</p>
+        </div>
+    </div>
+</div>
+
+<script src="region-data.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ================= 版本信息 =================
+  const APP_VERSION = '1.0.0';
+  const DATA_SOURCE = '全国容配比查询表0506.xlsx';
+
+  // ================= 1. 区域容配数据库 =================
+  const PROVINCE_CITY_DISTRICT = {};
+  if (typeof REGION_DB !== 'undefined' && REGION_DB) {
+    Object.keys(REGION_DB).forEach(k => {
+      const [p, c, d] = k.split('-');
+      if (!PROVINCE_CITY_DISTRICT[p]) PROVINCE_CITY_DISTRICT[p] = {};
+      if (!PROVINCE_CITY_DISTRICT[p][c]) PROVINCE_CITY_DISTRICT[p][c] = [];
+      if (!PROVINCE_CITY_DISTRICT[p][c].includes(d)) PROVINCE_CITY_DISTRICT[p][c].push(d);
+    });
+  }
+
+  // ================= 2. 容配比选项（单一数据源） =================
+  const RATIO_NORMAL = '1.2倍(正常)';
+  const RATIO_LIGHT = '1.1倍';
+  const RATIO_NONE = '1倍';
+
+  const RATIO_OPTIONS = [
+    { value: RATIO_NORMAL, label: '1.2倍 (正常超配)' },
+    { value: RATIO_LIGHT, label: '1.1倍 (轻度超配)' },
+    { value: RATIO_NONE, label: '1倍 (不超配)' }
+  ];
+
+  function mapRegionRatio(val) {
+    if (!val) return RATIO_NORMAL;
+    if (val.includes('1.2')) return RATIO_NORMAL;
+    if (val.includes('1.1')) return RATIO_LIGHT;
+    if (val === RATIO_NONE || val === '1') return RATIO_NONE;
+    return RATIO_NORMAL;
+  }
+
+  // ================= 3. 组件配置数据库 =================
+  const DB = {
+NEG21_715:{"1.2倍(正常)":[{r:[10,13],inv:"8",box:25},{r:[14,16],inv:"10",box:25},{r:[17,20],inv:"12",box:25},{r:[21,25],inv:"15",box:25},{r:[26,28],inv:"17",box:25},{r:[29,33],inv:"20",box:25},{r:[34,41],inv:"25",box:30},{r:[42,50],inv:"30",box:50},{r:[51,55],inv:"33",box:50},{r:[56,60],inv:"36",box:50},{r:[61,66],inv:"40",box:50},{r:[67,83],inv:"50",box:50},{r:[84,100],inv:"30+30",box:100},{r:[101,116],inv:"30+40",box:100},{r:[117,133],inv:"40+40",box:100},{r:[134,150],inv:"40+50",box:100},{r:[151,166],inv:"50+50",box:100},{r:[167,183],inv:"30+30+50",box:150},{r:[184,200],inv:"40+40+40",box:150},{r:[201,216],inv:"40+40+50",box:150},{r:[217,233],inv:"40+50+50",box:150},{r:[234,250],inv:"50+50+50",box:150},{r:[251,266],inv:"40+40+40+40",box:200},{r:[267,283],inv:"40+40+40+50",box:200},{r:[284,300],inv:"40+40+50+50",box:200},{r:[301,316],inv:"40+50+50+50",box:200},{r:[317,320],inv:"50+50+50+50",box:200}],"1.1倍":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:25},{r:[16,18],inv:"12",box:25},{r:[19,22],inv:"15",box:25},{r:[23,25],inv:"17",box:25},{r:[26,30],inv:"20",box:25},{r:[31,33],inv:"25",box:25},{r:[34,38],inv:"25",box:30},{r:[39,41],inv:"30",box:30},{r:[42,45],inv:"30",box:50},{r:[46,50],inv:"33",box:50},{r:[51,55],inv:"36",box:50},{r:[56,61],inv:"40",box:50},{r:[62,76],inv:"50",box:50},{r:[77,80],inv:"20+33",box:100},{r:[81,85],inv:"20+36",box:100},{r:[86,91],inv:"30+30",box:100},{r:[92,96],inv:"30+33",box:100},{r:[97,100],inv:"33+33",box:100},{r:[101,106],inv:"30+40",box:100},{r:[107,111],inv:"33+40",box:100},{r:[112,116],inv:"36+40",box:100},{r:[117,122],inv:"40+40",box:100},{r:[123,126],inv:"33+50",box:100},{r:[127,131],inv:"36+50",box:100},{r:[132,137],inv:"40+50",box:100},{r:[138,152],inv:"50+50",box:100},{r:[153,168],inv:"30+30+50",box:150},{r:[169,172],inv:"30+33+50",box:150},{r:[173,177],inv:"30+36+50",box:150},{r:[178,183],inv:"40+40+40",box:150},{r:[184,198],inv:"40+40+50",box:150},{r:[199,213],inv:"40+50+50",box:150},{r:[214,229],inv:"50+50+50",box:150},{r:[230,244],inv:"40+40+40+40",box:200},{r:[245,259],inv:"40+40+40+50",box:200},{r:[260,275],inv:"40+40+50+50",box:200},{r:[276,290],inv:"40+50+50+50",box:200},{r:[291,305],inv:"50+50+50+50",box:200}],"1倍":[{r:[10,11],inv:"8",box:25},{r:[12,13],inv:"10",box:25},{r:[14,16],inv:"12",box:25},{r:[17,20],inv:"15",box:25},{r:[21,23],inv:"17",box:25},{r:[24,27],inv:"20",box:25},{r:[28,33],inv:"25",box:25},{r:[34,34],inv:"25",box:30},{r:[35,41],inv:"30",box:30},{r:[42,45],inv:"33",box:50},{r:[46,50],inv:"36",box:50},{r:[51,55],inv:"40",box:50},{r:[56,69],inv:"50",box:50},{r:[70,73],inv:"20+33",box:100},{r:[74,77],inv:"20+36",box:100},{r:[78,83],inv:"30+30",box:100},{r:[84,87],inv:"30+33",box:100},{r:[88,91],inv:"33+33",box:100},{r:[92,97],inv:"30+40",box:100},{r:[98,101],inv:"33+40",box:100},{r:[102,105],inv:"36+40",box:100},{r:[106,111],inv:"40+40",box:100},{r:[112,115],inv:"33+50",box:100},{r:[116,119],inv:"36+50",box:100},{r:[120,125],inv:"40+50",box:100},{r:[126,138],inv:"50+50",box:100},{r:[139,152],inv:"30+30+50",box:150},{r:[153,156],inv:"30+33+50",box:150},{r:[157,161],inv:"30+36+50",box:150},{r:[162,166],inv:"40+40+40",box:150},{r:[167,180],inv:"40+40+50",box:150},{r:[181,194],inv:"40+50+50",box:150},{r:[195,208],inv:"50+50+50",box:150},{r:[209,222],inv:"40+40+40+40",box:200},{r:[223,236],inv:"40+40+40+50",box:200},{r:[237,250],inv:"40+40+50+50",box:200},{r:[251,263],inv:"40+50+50+50",box:200},{r:[264,277],inv:"50+50+50+50",box:200}]},
+NEG21_730:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,16],inv:"10",box:25},{r:[17,19],inv:"12",box:25},{r:[20,24],inv:"15",box:25},{r:[25,27],inv:"17",box:25},{r:[28,32],inv:"20",box:25},{r:[33,40],inv:"25",box:30},{r:[41,48],inv:"30",box:50},{r:[49,53],inv:"33",box:50},{r:[54,58],inv:"36",box:50},{r:[59,64],inv:"40",box:50},{r:[65,81],inv:"50",box:50},{r:[82,97],inv:"30+30",box:100},{r:[98,113],inv:"30+40",box:100},{r:[114,129],inv:"40+40",box:100},{r:[130,145],inv:"40+50",box:100},{r:[146,162],inv:"50+50",box:100},{r:[163,178],inv:"30+30+50",box:150},{r:[179,194],inv:"40+40+40",box:150},{r:[195,210],inv:"40+40+50",box:150},{r:[211,227],inv:"40+50+50",box:150},{r:[228,243],inv:"50+50+50",box:150},{r:[244,259],inv:"40+40+40+40",box:200},{r:[260,275],inv:"40+40+40+50",box:200},{r:[276,291],inv:"40+40+50+50",box:200},{r:[292,308],inv:"40+50+50+50",box:200},{r:[309,320],inv:"50+50+50+50",box:200}],"1.1倍":[{r:[10,11],inv:"8",box:25},{r:[12,14],inv:"10",box:25},{r:[15,17],inv:"12",box:25},{r:[18,22],inv:"15",box:25},{r:[23,25],inv:"17",box:25},{r:[26,29],inv:"20",box:25},{r:[30,32],inv:"25",box:25},{r:[33,37],inv:"25",box:30},{r:[38,40],inv:"30",box:30},{r:[41,44],inv:"30",box:50},{r:[45,49],inv:"33",box:50},{r:[50,53],inv:"36",box:50},{r:[54,59],inv:"40",box:50},{r:[60,74],inv:"50",box:50},{r:[75,78],inv:"20+33",box:100},{r:[79,83],inv:"20+36",box:100},{r:[84,89],inv:"30+30",box:100},{r:[90,93],inv:"30+33",box:100},{r:[94,98],inv:"33+33",box:100},{r:[99,104],inv:"30+40",box:100},{r:[105,108],inv:"33+40",box:100},{r:[109,112],inv:"36+40",box:100},{r:[113,118],inv:"40+40",box:100},{r:[119,123],inv:"33+50",box:100},{r:[124,127],inv:"36+50",box:100},{r:[128,133],inv:"40+50",box:100},{r:[134,148],inv:"50+50",box:100},{r:[149,163],inv:"30+30+50",box:150},{r:[164,167],inv:"30+33+50",box:150},{r:[168,172],inv:"30+36+50",box:150},{r:[173,178],inv:"40+40+40",box:150},{r:[179,193],inv:"40+40+50",box:150},{r:[194,208],inv:"40+50+50",box:150},{r:[209,222],inv:"50+50+50",box:150},{r:[223,237],inv:"40+40+40+40",box:200},{r:[238,252],inv:"40+40+40+50",box:200},{r:[253,267],inv:"40+40+50+50",box:200},{r:[268,282],inv:"40+50+50+50",box:200},{r:[283,297],inv:"50+50+50+50",box:200}],"1倍":[{r:[10,10],inv:"8",box:25},{r:[11,13],inv:"10",box:25},{r:[14,16],inv:"12",box:25},{r:[17,20],inv:"15",box:25},{r:[21,22],inv:"17",box:25},{r:[23,27],inv:"20",box:25},{r:[28,32],inv:"25",box:25},{r:[33,33],inv:"25",box:30},{r:[34,40],inv:"30",box:30},{r:[41,44],inv:"33",box:50},{r:[45,48],inv:"36",box:50},{r:[49,54],inv:"40",box:50},{r:[55,67],inv:"50",box:50},{r:[68,71],inv:"20+33",box:100},{r:[72,75],inv:"20+36",box:100},{r:[76,81],inv:"30+30",box:100},{r:[82,85],inv:"30+33",box:100},{r:[86,89],inv:"33+33",box:100},{r:[90,94],inv:"30+40",box:100},{r:[95,98],inv:"33+40",box:100},{r:[99,102],inv:"36+40",box:100},{r:[103,108],inv:"40+40",box:100},{r:[109,112],inv:"33+50",box:100},{r:[113,116],inv:"36+50",box:100},{r:[117,121],inv:"40+50",box:100},{r:[122,135],inv:"50+50",box:100},{r:[136,148],inv:"30+30+50",box:150},{r:[149,152],inv:"30+33+50",box:150},{r:[153,156],inv:"30+36+50",box:150},{r:[157,162],inv:"40+40+40",box:150},{r:[163,175],inv:"40+40+50",box:150},{r:[176,189],inv:"40+50+50",box:150},{r:[190,202],inv:"50+50+50",box:150},{r:[203,216],inv:"40+40+40+40",box:200},{r:[217,229],inv:"40+40+40+50",box:200},{r:[230,243],inv:"40+40+50+50",box:200},{r:[244,256],inv:"40+50+50+50",box:200},{r:[257,270],inv:"50+50+50+50",box:200}]},
+NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:25},{r:[16,18],inv:"12",box:25},{r:[19,22],inv:"15",box:25},{r:[23,25],inv:"17",box:25},{r:[26,30],inv:"20",box:25},{r:[31,37],inv:"25",box:30},{r:[38,45],inv:"30",box:50},{r:[46,49],inv:"33",box:50},{r:[50,54],inv:"36",box:50},{r:[55,60],inv:"40",box:50},{r:[61,75],inv:"50",box:50},{r:[76,90],inv:"30+30",box:100},{r:[91,105],inv:"30+40",box:100},{r:[106,120],inv:"40+40",box:100},{r:[121,135],inv:"40+50",box:100},{r:[136,150],inv:"50+50",box:100},{r:[151,165],inv:"30+30+50",box:150},{r:[166,180],inv:"40+40+40",box:150},{r:[181,195],inv:"40+40+50",box:150},{r:[196,210],inv:"40+50+50",box:150},{r:[211,225],inv:"50+50+50",box:150},{r:[226,240],inv:"40+40+40+40",box:200},{r:[241,250],inv:"40+40+40+50",box:200}],"1.1倍":[{r:[10,10],inv:"8",box:25},{r:[11,12],inv:"10",box:25},{r:[13,15],inv:"12",box:25},{r:[16,18],inv:"15",box:25},{r:[19,21],inv:"17",box:25},{r:[22,25],inv:"20",box:25},{r:[26,30],inv:"25",box:25},{r:[31,31],inv:"25",box:30},{r:[32,37],inv:"30",box:30},{r:[38,41],inv:"33",box:50},{r:[42,45],inv:"36",box:50},{r:[46,50],inv:"40",box:50},{r:[51,62],inv:"50",box:50},{r:[63,66],inv:"20+33",box:100},{r:[67,70],inv:"20+36",box:100},{r:[71,75],inv:"30+30",box:100},{r:[76,78],inv:"30+33",box:100},{r:[79,82],inv:"30+36",box:100},{r:[83,87],inv:"30+40",box:100},{r:[88,91],inv:"33+40",box:100},{r:[92,95],inv:"36+40",box:100},{r:[96,100],inv:"40+40",box:100},{r:[101,103],inv:"33+50",box:100},{r:[104,107],inv:"36+50",box:100},{r:[108,112],inv:"40+50",box:100},{r:[113,125],inv:"50+50",box:100},{r:[126,137],inv:"30+30+50",box:150},{r:[138,141],inv:"30+33+50",box:150},{r:[142,145],inv:"30+36+50",box:150},{r:[146,150],inv:"40+40+40",box:150},{r:[151,162],inv:"40+40+50",box:150},{r:[163,175],inv:"40+50+50",box:150},{r:[176,187],inv:"50+50+50",box:150},{r:[188,200],inv:"40+40+40+40",box:200},{r:[201,212],inv:"40+40+40+50",box:200},{r:[213,250],inv:"40+50+50+50",box:200}],"1倍":[{r:[10,10],inv:"8",box:25},{r:[11,12],inv:"10",box:25},{r:[13,15],inv:"12",box:25},{r:[16,18],inv:"15",box:25},{r:[19,21],inv:"17",box:25},{r:[22,25],inv:"20",box:25},{r:[26,30],inv:"25",box:25},{r:[31,31],inv:"25",box:30},{r:[32,37],inv:"30",box:30},{r:[38,41],inv:"33",box:50},{r:[42,45],inv:"36",box:50},{r:[46,50],inv:"40",box:50},{r:[51,62],inv:"50",box:50},{r:[63,66],inv:"20+33",box:100},{r:[67,70],inv:"20+36",box:100},{r:[71,75],inv:"30+30",box:100},{r:[76,78],inv:"30+33",box:100},{r:[79,82],inv:"30+36",box:100},{r:[83,87],inv:"30+40",box:100},{r:[88,91],inv:"33+40",box:100},{r:[92,95],inv:"36+40",box:100},{r:[96,100],inv:"40+40",box:100},{r:[101,103],inv:"33+50",box:100},{r:[104,107],inv:"36+50",box:100},{r:[108,112],inv:"40+50",box:100},{r:[113,125],inv:"50+50",box:100},{r:[126,137],inv:"30+30+50",box:150},{r:[138,141],inv:"30+33+50",box:150},{r:[142,145],inv:"30+36+50",box:150},{r:[146,150],inv:"40+40+40",box:150},{r:[151,162],inv:"40+40+50",box:150},{r:[163,175],inv:"40+50+50",box:150},{r:[176,187],inv:"50+50+50",box:150},{r:[188,200],inv:"40+40+40+40",box:200},{r:[201,212],inv:"40+40+40+50",box:200},{r:[213,237],inv:"40+50+50+50",box:200},{r:[238,250],inv:"50+50+50+50",box:200}]}
+};
+  const HUNAN_DB = {
+    "1.2倍(正常)": [
+      { r: [65, 68], inv: "17+25", box: 50 },
+      { r: [69, 72], inv: "20+25", box: 50 },
+      { r: [73, 76], inv: "17+30", box: 50 }
+    ],
+    "1.1倍": [
+      { r: [60, 62], inv: "17+25", box: 50 },
+      { r: [63, 66], inv: "20+25", box: 50 },
+      { r: [67, 69], inv: "17+30", box: 50 }
+    ],
+    "1倍": [
+      { r: [55, 56], inv: "17+25", box: 50 },
+      { r: [57, 60], inv: "20+25", box: 50 },
+      { r: [61, 63], inv: "17+30", box: 50 }
+    ]
+  };
+  const CABLE_THRESHOLDS = [
+    { limit: 20, cu: "3×10+2×6 mm²", al: "3×16+1×10 mm²" },
+    { limit: 33, cu: "3×16+2×10 mm²", al: "3×25+1×10 mm²" },
+    { limit: 50, cu: "3×25+2×16 mm²", al: "3×35+1×16 mm²" },
+    { limit: 60, cu: "3×35+2×16 mm²", al: "3×50+1×25 mm²" },
+    { limit: 70, cu: "3×50+2×25 mm²", al: "3×70+1×35 mm²" },
+    { limit: 80, cu: "3×50+2×25 mm²", al: "3×70+1×35 mm²" },
+    { limit: 90, cu: "3×70+2×35 mm²", al: "3×95+1×50 mm²" },
+    { limit: 100, cu: "3×70+2×35 mm²", al: "3×95+1×50 mm²" },
+    { limit: 125, cu: "3×95+1×50 mm²", al: "3×120+1×70 mm²" },
+    { limit: 160, cu: "3×120+1×70 mm²", al: "3×150+1×70 mm²" }
+  ];
+  function lookupCable(power, type) {
+    for (const t of CABLE_THRESHOLDS) { if (power <= t.limit) return type === 'cu' ? t.cu : t.al; }
+    return type === 'cu' ? "3×120+1×70 mm²" : "3×150+1×70 mm²";
+  }
+
+  // ================= 4. DOM 缓存 =================
+  const $ = {};
+  function cacheDom() {
+    $.province = document.getElementById('province');
+    $.city = document.getElementById('city');
+    $.district = document.getElementById('district');
+    $.ratio = document.getElementById('ratio');
+    $.series = document.getElementById('series');
+    $.count = document.getElementById('count');
+    $.queryBtn = document.getElementById('queryBtn');
+    $.msgBox = document.getElementById('msgBox');
+    $.msgText = document.getElementById('msgText');
+    $.msgClose = document.querySelector('#msgBox .msg-close');
+    $.resultPanel = document.getElementById('resultPanel');
+    $.resInv = document.getElementById('resInv');
+    $.resCu = document.getElementById('resCu');
+    $.resBox = document.getElementById('resBox');
+    $.resAl = document.getElementById('resAl');
+    $.gridNote = document.getElementById('gridNote');
+    $.warningMsg = document.getElementById('warningMsg');
+    $.copyBtn = document.getElementById('copyBtn');
+  }
+
+  // ================= 5. 输入状态读取（业务逻辑与 DOM 解耦） =================
+  function getInputState() {
+    return {
+      province: $.province.value,
+      city: $.city.value,
+      district: $.district.value,
+      series: $.series.value,
+      ratio: $.ratio.value,
+      count: parseInt($.count.value, 10)
+    };
+  }
+
+  // ================= 6. 纯数据查询（无 DOM 调用） =================
+  function lookupMatch(state) {
+    let match = null;
+    // 湖南优先查专用配置
+    if (state.province === '湖南省' && HUNAN_DB[state.ratio]) {
+      for (const row of HUNAN_DB[state.ratio]) {
+        if (state.count >= row.r[0] && state.count <= row.r[1]) { match = row; break; }
+      }
+    }
+    if (!match && state.series === 'NEG21_730') {
+      for (const row of DB.NEG21_730[state.ratio]) {
+        if (state.count >= row.r[0] && state.count <= row.r[1]) { match = row; break; }
+      }
+    }
+    if (!match && DB[state.series] && DB[state.series][state.ratio]) {
+      for (const row of DB[state.series][state.ratio]) {
+        if (state.count >= row.r[0] && state.count <= row.r[1]) { match = row; break; }
+      }
+    }
+    return match;
+  }
+
+  // ================= 7. DOM 操作 =================
+  function hideResult() { $.resultPanel.style.display = 'none'; }
+
+  function showError(msg) {
+    $.msgText.textContent = msg;
+    $.msgBox.style.display = 'block';
+    $.resultPanel.style.display = 'none';
+  }
+
+  function hideError() { $.msgBox.style.display = 'none'; }
+
+  function clearFormErrors() {
+    document.querySelectorAll('.form-group.has-error').forEach(el => el.classList.remove('has-error'));
+  }
+
+  function renderResult(match, state) {
+    const invPowers = match.inv.split('+').map(Number);
+    const totalPower = invPowers.reduce((a, b) => a + b, 0);
+    const isSmallPower = invPowers.length === 1 && (invPowers[0] === 8 || invPowers[0] === 10);
+
+    if (isSmallPower) {
+      $.resInv.textContent = `${invPowers[0]}kW单相 / ${invPowers[0]}kW三相`;
+      $.resBox.textContent = '10kW单相，25kW三相';
+      $.resCu.innerHTML = '<span class="cable-line">单相：3×10 mm²</span><span class="cable-line">三相：3×10+2×6 mm²</span>';
+      $.resAl.innerHTML = '<span class="cable-line">单相：2×16 mm²</span><span class="cable-line">三相：3×16+1×10 mm²</span>';
+    } else {
+      let cuHtml = '';
+      for (let i = 0; i < invPowers.length; i++) {
+        const pw = invPowers[i];
+        const label = match.inv.includes('+') ? `<span class="cable-label">${pw}kW → </span>` : '';
+        cuHtml += `<span class="cable-line">${label}${lookupCable(pw, 'cu')}</span>`;
+      }
+      $.resInv.textContent = `${match.inv}kW 三相`;
+      $.resCu.innerHTML = cuHtml;
+      $.resBox.textContent = `${match.box}kW`;
+      $.resAl.textContent = lookupCable(totalPower, 'al');
+    }
+
+    const regionRule = REGION_DB[`${state.province}-${state.city}-${state.district}`];
+    if (regionRule?.b && regionRule.b !== '标准') {
+      $.gridNote.textContent = '备注：' + regionRule.b;
+      $.gridNote.style.display = 'flex';
+    } else {
+      $.gridNote.style.display = 'none';
+    }
+    $.warningMsg.style.display = totalPower > 100 ? 'flex' : 'none';
+    $.resultPanel.style.display = 'block';
+  }
+
+  function showDataLoadError() {
+    $.msgText.textContent = '⚠️ 区域数据加载失败，请刷新页面重试。如持续失败，请联系技术支持。';
+    $.msgBox.style.display = 'block';
+    $.queryBtn.disabled = true;
+    $.queryBtn.textContent = '数据不可用';
+  }
+
+  // ================= 8. 事件处理 =================
+  function handleQuery() {
+    if ($.queryBtn.classList.contains('success')) return;
+    hideError();
+    hideResult();
+    clearFormErrors();
+    $.queryBtn.classList.remove('loading', 'success');
+    $.queryBtn.textContent = '智能匹配查询';
+
+    const state = getInputState();
+    let hasErr = false;
+    if (!state.province) {
+      $.province.closest('.form-group').classList.add('has-error');
+      showError('⚠️ 请选择省份');
+      hasErr = true;
+    }
+    if (!state.count || isNaN(state.count) || state.count < 10 || state.count > 330) {
+      $.count.closest('.form-group').classList.add('has-error');
+      if (!hasErr) showError('⚠️ 请输入有效数量（10 ~ 330 片）');
+      hasErr = true;
+    }
+    if (hasErr) return;
+
+    $.queryBtn.classList.add('loading');
+    const match = lookupMatch(state);
+    if (!match) {
+      $.queryBtn.classList.remove('loading');
+      showError('❌ 未找到匹配项。可能原因：当前数量不在该系列/容配比配置范围内，或该地区暂不支持此配置。请核对或联系技术支持。');
+      return;
+    }
+    renderResult(match, state);
+    $.queryBtn.classList.remove('loading');
+    $.queryBtn.classList.add('success');
+    $.queryBtn.textContent = '✓ 查询完成';
+    setTimeout(() => { $.queryBtn.classList.remove('success'); $.queryBtn.textContent = '智能匹配查询'; }, 1500);
+  }
+
+  function handleCascade(lv) {
+    const p = $.province.value, c = $.city.value;
+    hideResult();
+    $.city.classList.add('cascading');
+    $.district.classList.add('cascading');
+
+    if (lv === 'province' || lv === 'init') {
+      $.city.innerHTML = '<option value="">请选择</option>';
+      $.district.innerHTML = '<option value="">请选择</option>';
+      if (p && PROVINCE_CITY_DISTRICT[p]) Object.keys(PROVINCE_CITY_DISTRICT[p]).sort().forEach(x => $.city.add(new Option(x, x)));
+    }
+    if (lv === 'city' || lv === 'province') {
+      $.district.innerHTML = '<option value="">请选择</option>';
+      if (p && c && PROVINCE_CITY_DISTRICT[p]?.[c]) PROVINCE_CITY_DISTRICT[p][c].sort().forEach(x => $.district.add(new Option(x, x)));
+    }
+
+    if (!p) {
+      $.series.innerHTML = '<option value="">请先选择地区</option>';
+    } else if (p === '湖南省') {
+      $.series.innerHTML = '<option value="NEG21_730">NEG21 (730W~740W)</option>';
+    } else {
+      $.series.innerHTML = '<option value="NEG21_715">NEG21 (715W~720W)</option><option value="NEG21_730">NEG21 (730W~740W)</option><option value="NEG22_800">NEG22 (790W~800W)</option>';
+    }
+    if ($.series.options.length > 0 && $.series.options[0].value) $.series.value = $.series.options[0].value;
+    setTimeout(() => { $.city.classList.remove('cascading'); $.district.classList.remove('cascading'); }, 300);
+    if (lv === 'district' || lv === 'city') applyRegionRule();
+  }
+
+  function applyRegionRule() {
+    const p = $.province.value, c = $.city.value, d = $.district.value;
+    $.ratio.value = mapRegionRatio((REGION_DB[`${p}-${c}-${d}`] || {}).r);
+  }
+
+  function handleCountBlur() {
+    const val = parseInt($.count.value, 10);
+    const fg = $.count.closest('.form-group');
+    if ($.count.value && (isNaN(val) || val < 10 || val > 330)) {
+      fg.classList.add('has-error');
+      $.msgText.textContent = '⚠️ 请输入有效数量（10 ~ 330 片）';
+      $.msgBox.style.display = 'block';
+    } else {
+      fg.classList.remove('has-error');
+      hideError();
+    }
+  }
+
+  function handleCopy() {
+    const text = `逆变器配置：${$.resInv.textContent}\n逆变器交流铜线：${$.resCu.textContent}\n并网箱配置：${$.resBox.textContent}\n并网箱交流铝线：${$.resAl.textContent}`;
+    navigator.clipboard.writeText(text).then(() => {
+      $.copyBtn.textContent = '✓ 已复制';
+      $.copyBtn.classList.add('copied');
+      setTimeout(() => { $.copyBtn.textContent = '复制结果'; $.copyBtn.classList.remove('copied'); }, 2000);
+    }).catch(() => {
+      showError('⚠️ 复制失败，请手动复制');
+    });
+  }
+
+  // ================= 9. 初始化 =================
+  function init() {
+    cacheDom();
+    Object.keys(PROVINCE_CITY_DISTRICT).sort().forEach(p => $.province.add(new Option(p, p)));
+    RATIO_OPTIONS.forEach(o => $.ratio.add(new Option(o.label, o.value)));
+    $.province.addEventListener('change', () => handleCascade('province'));
+    $.city.addEventListener('change', () => handleCascade('city'));
+    $.district.addEventListener('change', () => handleCascade('district'));
+    $.queryBtn.addEventListener('click', handleQuery);
+    $.copyBtn.addEventListener('click', handleCopy);
+    $.msgClose.addEventListener('click', () => { $.msgBox.style.display = 'none'; });
+    $.count.addEventListener('keypress', e => { if (e.key === 'Enter') handleQuery(); });
+    $.count.addEventListener('blur', handleCountBlur);
+    $.count.addEventListener('change', hideResult);
+    $.count.addEventListener('input', function() { this.closest('.form-group').classList.remove('has-error'); hideError(); });
+    $.series.addEventListener('change', hideResult);
+    if (typeof REGION_DB === 'undefined' || !REGION_DB) showDataLoadError();
+    handleCascade('init');
+  }
+
+  init();
+})();
+</script></body></html>
