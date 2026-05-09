@@ -18,7 +18,6 @@
         select, input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:#FAFAFA; transition:all 0.2s ease; color:var(--text-primary); }
         select:focus, input:focus { outline:none; border-color:var(--primary); background:#FFF; box-shadow:0 0 0 3px var(--primary-light); }
         select:disabled { background:#F5F7FA; color:var(--text-primary); cursor:default; border-color:#E5E6EB; -webkit-appearance:none; -moz-appearance:none; appearance:none; background-image:none; opacity:0.7; }
-        #ratio:disabled { padding-right:12px; }
         input::placeholder { color:#86909C; opacity:1; }
         /* 隐藏数字输入框的调拨按钮 */
         input[type=number]::-webkit-inner-spin-button,
@@ -39,12 +38,12 @@
         .warning-msg { margin-top:12px; padding:12px 16px; background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:8px; font-size:13px; color:var(--warn-text); display:none; align-items:center; gap:8px; font-weight:500; animation:warnFadeIn 0.3s ease; }
         @keyframes warnFadeIn { from{opacity:0;transform:translateY(-6px);max-height:0;padding-top:0;padding-bottom:0;overflow:hidden} to{opacity:1;transform:translateY(0);max-height:80px;padding-top:12px;padding-bottom:12px} }
         .warning-msg::before { content:"⚠️"; font-size:16px; }
-        .rules-panel { margin-top:20px; border:1px solid var(--border); background:#F9FAFB; border-radius:8px; padding:16px; border-left:3px solid var(--primary); }
+        .rules-panel { margin-top:20px; background:#E6F4FF; border-radius:8px; padding:16px 20px; border-left:4px solid var(--primary); }
         .rules-title { font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:8px; }
         .rules-content { font-size:13px; color:var(--text-body); line-height:1.6; }
         .rules-content ol { padding-left:18px; margin:6px 0; }
         .rules-content li { margin-bottom:4px; }
-        @media(max-width:768px) { .input-grid { grid-template-columns:1fr 1fr; } .input-grid .form-group:nth-child(3), .input-grid .form-group:nth-child(6) { grid-column:span 2; } .result-grid { grid-template-columns:1fr; } }
+        @media(max-width:768px) { .input-grid { grid-template-columns:1fr; } .result-grid { grid-template-columns:1fr; } }
         #msgBox { text-align:center; color:#CF1322; background:#FFF1F0; border:1px solid #FFA39E; border-radius:8px; padding:10px 16px; display:none; margin-bottom:12px; font-size:14px; font-weight:500; position:relative; }
         #msgBox .msg-close { position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:16px; color:#CF1322; background:none; border:none; line-height:1; padding:4px; border-radius:4px; transition:background 0.15s; }
         #msgBox .msg-close:hover { background:rgba(207,19,34,0.08); }
@@ -56,7 +55,6 @@
         /* ===== 查询按钮加载态 ===== */
         .btn-primary.loading { pointer-events:none; opacity:0.7; }
         /* ===== 容配比值变化反馈 ===== */
-        .ratio-flash { animation:ratioPulse 0.6s ease; }
         @keyframes ratioPulse { 0%{box-shadow:0 0 0 0 rgba(22,119,255,0.3)} 50%{box-shadow:0 0 0 4px rgba(22,119,255,0.15)} 100%{box-shadow:0 0 0 0 rgba(22,119,255,0)} }
         .ratio-hint { font-size:12px; color:var(--text-secondary); margin-top:6px; line-height:1.4; }
         .lock-badge { font-size:11px; opacity:0.6; }
@@ -78,10 +76,6 @@
         .search-clear { position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:none; color:#86909C; font-size:18px; line-height:1; cursor:pointer; display:none; transition:color 0.15s; padding:4px; border-radius:4px; }
         .search-clear:hover { color:var(--text-body); background:rgba(0,0,0,0.04); }
 
-        /* ===== 初始化引导提示 ===== */
-        .search-tip { font-size:12px; color:#86909C; margin-top:6px; transition:opacity 0.3s; }
-        .search-tip.hidden { opacity:0; pointer-events:none; }
-
         /* ===== 搜索结果下拉 ===== */
         .search-dropdown { position:absolute; top:100%; left:0; right:0; z-index:100; background:#FFF; border:1px solid var(--border); border-radius:0 0 8px 8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); max-height:360px; overflow-y:auto; display:none; margin-top:2px; }
         .search-dropdown.sd-visible { display:block; animation:sdFadeIn 0.15s ease; }
@@ -96,61 +90,80 @@
         .search-dropdown .sd-match-type { font-size:11px; color:var(--text-muted); margin-left:auto; }
 
         /* ===== 最近使用 ===== */
-        .recent-section { margin-top:4px; display:none; }
-        .recent-header { font-size:12px; color:var(--text-secondary); font-weight:500; margin-bottom:4px; }
+        .recent-section { margin-top:10px; display:none; }
+        .recent-header { font-size:12px; color:var(--text-secondary); font-weight:500; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; }
         .recent-list { display:flex; flex-wrap:wrap; gap:6px; }
         .recent-item { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; background:#F5F7FA; border:1px solid var(--border); border-radius:6px; font-size:12px; cursor:pointer; transition:all 0.15s; max-width:100%; }
         .recent-item > span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px; }
         .recent-item:hover { border-color:var(--primary); background:var(--primary-light); }
         .recent-item .ri-del { font-size:14px; color:var(--text-muted); cursor:pointer; line-height:1; padding:0 2px; }
         .recent-item .ri-del:hover { color:#FF4D4F; }
-        .recent-footer { margin-top:4px; }
         .recent-clear { font-size:11px; color:var(--text-muted); cursor:pointer; user-select:none; }
         .recent-clear:hover { color:var(--text-secondary); }
 
         /* ===== 展开链接 ===== */
-        .expand-link { font-size:12px; color:var(--primary); cursor:pointer; user-select:none; margin-top:6px; display:inline-block; padding:4px 8px; border-radius:4px; transition:background 0.15s; margin-left:2px; }
-        .expand-link:hover { background:var(--primary-light); color:var(--primary-hover); }
+        .expand-link { font-size:12px; color:var(--text-secondary); cursor:pointer; user-select:none; margin-top:10px; display:inline-block; padding:4px 8px; border-radius:4px; transition:background 0.15s; margin-left:2px; }
+        .expand-link:hover { background:var(--primary-light); color:var(--text-primary); }
         .expand-link .expand-arrow { display:inline-block; transition:transform 0.2s; font-size:10px; }
         .expand-link.expanded .expand-arrow { transform:rotate(180deg); }
 
         /* ===== 折叠级联区 ===== */
-        .cascading-wrap { overflow:hidden; transition:max-height 0.3s ease, opacity 0.25s ease; max-height:0; opacity:0; }
+        .cascading-wrap { overflow:hidden; transition:max-height 0.3s ease, opacity 0.25s ease; max-height:0; opacity:0; margin-top:6px; }
         .cascading-wrap.visible { max-height:200px; opacity:1; }
         .cascading-wrap .input-grid { margin-bottom:0; }
+
+        /* ===== 容配比文本展示 ===== */
+        .ratio-display { width:100%; padding:10px 12px; border:1px solid #E5E6EB; border-radius:8px; font-size:14px; background:#F0F2F5; color:#595959; cursor:default; display:flex; align-items:center; gap:8px; min-height:42px; }
+        .ratio-display .ratio-value { font-weight:600; }
+        .ratio-flash { animation:ratioPulse 0.6s ease; }
+
+        /* ===== 输入框后缀（片） ===== */
+        .input-with-suffix { position:relative; display:flex; align-items:center; width:100%; }
+        .input-with-suffix input { padding-right:36px; }
+        .input-suffix { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:14px; pointer-events:none; line-height:1; }
+
+        /* ===== 步骤分区 ===== */
+        .section-step { font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .step-badge { display:inline-flex; align-items:center; justify-content:center; background:var(--primary); color:#FFF; font-size:12px; font-weight:600; border-radius:4px; padding:2px 8px; line-height:1.4; }
+        .param-section { background:#F9FAFB; border-radius:8px; padding:20px; margin-top:24px; }
+        .step-card { background:#F9FAFB; border-radius:8px; padding:20px; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header"><h1>组件-逆变器及线缆匹配查询</h1><div class="subtitle">0509更新，支持NEG 715-800W组件，有疑问处请联系南部解决方案部段林钢</div></div>
-    <div class="search-section">
-        <div class="form-group"><label>搜索地区</label>
-            <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="搜索地区（支持中文/拼音，如：番禺 / gz）" autocomplete="off">
-                <button class="search-clear" id="searchClear">×</button>
+    <div class="step-card">
+        <div class="section-step" style="margin-bottom:16px;"><span class="step-badge">第一步</span> 确定项目地</div>
+        <div class="search-section">
+            <div class="form-group">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="搜索地区（支持中文/拼音，如：番禺 / gz）" autocomplete="off">
+                    <button class="search-clear" id="searchClear">×</button>
+                </div>
+                <div id="searchResults" class="search-dropdown"></div>
             </div>
-            <div id="searchResults" class="search-dropdown"></div>
+            <div id="recentSection" class="recent-section">
+                <div class="recent-header"><span>最近使用</span><span class="recent-clear" id="recentClear">清空记录</span></div>
+                <div id="recentList" class="recent-list"></div>
+            </div>
+            <span class="expand-link" id="expandLink">展开地区选择 <span class="expand-arrow">▼</span></span>
         </div>
-        <div id="recentSection" class="recent-section">
-            <div class="recent-header">最近使用</div>
-            <div id="recentList" class="recent-list"></div>
-            <div class="recent-footer"><span class="recent-clear" id="recentClear">清空记录</span></div>
-        </div>
-        <span class="expand-link" id="expandLink">或展开地区选择 <span class="expand-arrow">⌵</span></span>
-        <div class="search-tip" id="searchTip">💡 输入地区名称或拼音开始查询</div>
-    </div>
-    <div class="cascading-wrap" id="cascadingWrap">
+        <div class="cascading-wrap" id="cascadingWrap">
         <div class="input-grid">
             <div class="form-group"><label>省份</label><select id="province"><option value="">请选择省份</option></select></div>
             <div class="form-group"><label>城市</label><select id="city"><option value="">请选择</option></select></div>
             <div class="form-group"><label>区县</label><select id="district"><option value="">请选择</option></select></div>
         </div>
     </div>
-    <div class="input-grid" style="margin-top:16px;">
-        <div class="form-group"><label>容配比 <span class="lock-badge">🔒</span></label><select id="ratio" disabled></select><div class="ratio-hint" id="ratioHint">选择区县后自动匹配</div></div>
-        <div class="form-group"><label>组件系列</label><select id="series"><option value="">请先选择地区</option></select></div>
-        <div class="form-group"><label for="count">组件数量 (片)</label><input type="number" id="count" placeholder="10 ~ 330 片" min="10" max="330" step="1"></div>
+    </div>
+    <div class="param-section">
+        <div class="section-step" style="margin-bottom:18px;"><span class="step-badge">第二步</span> 输入项目参数</div>
+        <div class="input-grid">
+            <div class="form-group"><label>容配比 <span class="lock-badge">🔒</span></label><div class="ratio-display" id="ratio"><span class="ratio-value">1.2倍 (正常超配)</span></div><div class="ratio-hint" id="ratioHint">选择区县后自动匹配</div></div>
+            <div class="form-group"><label>组件系列</label><select id="series"><option value="">请先选择地区</option></select></div>
+            <div class="form-group"><label for="count">组件数量</label><div class="input-with-suffix"><input type="number" id="count" placeholder="10 ~ 330" min="10" max="330" step="1"><span class="input-suffix">片</span></div></div>
+        </div>
     </div>
     <button class="btn-primary" id="queryBtn">智能匹配查询</button>
     <div id="msgBox" role="alert"><span id="msgText"></span><button class="msg-close" aria-label="关闭">×</button></div>
@@ -293,7 +306,6 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
     $.recentClear = document.getElementById('recentClear');
     $.expandLink = document.getElementById('expandLink');
     $.cascadingWrap = document.getElementById('cascadingWrap');
-    $.searchTip = document.getElementById('searchTip');
     $.province = document.getElementById('province');
     $.city = document.getElementById('city');
     $.district = document.getElementById('district');
@@ -321,7 +333,7 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
       city: $.city.value,
       district: $.district.value,
       series: $.series.value,
-      ratio: $.ratio.value,
+      ratio: $.ratio.dataset.value || '1.2倍(正常)',
       count: parseInt($.count.value, 10)
     };
   }
@@ -554,7 +566,6 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
   function selectDistrict(areaKey) {
     const [p, c, d] = areaKey.split('-');
     if (!p || !c || !d) return;
-    if ($.searchTip) $.searchTip.classList.add('hidden');
     // handleCascade 内部统一处理级联下拉框的 DOM 更新
     handleCascade('province', p, c);
     handleCascade('city', p, c, d);
@@ -692,8 +703,11 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
   function applyRegionRule(p, c, d) {
     if (!p) { p = $.province.value; c = $.city.value; d = $.district.value; }
     const newVal = mapRegionRatio((REGION_DB[`${p}-${c}-${d}`] || {}).r);
-    if ($.ratio.value !== newVal) {
-      $.ratio.value = newVal;
+    const oldVal = $.ratio.dataset.value;
+    if (oldVal !== newVal) {
+      $.ratio.dataset.value = newVal;
+      const label = RATIO_OPTIONS.find(o => o.value === newVal)?.label || newVal;
+      $.ratio.querySelector('.ratio-value').textContent = label;
       $.ratio.classList.remove('ratio-flash');
       void $.ratio.offsetWidth; // force reflow
       $.ratio.classList.add('ratio-flash');
@@ -757,13 +771,32 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
     handleCascade('province');
     $.city.value = '';
     $.district.value = '';
-    $.ratio.value = RATIO_NORMAL;
+    $.ratio.dataset.value = RATIO_NORMAL;
+    const defaultLabel = RATIO_OPTIONS.find(o => o.value === RATIO_NORMAL)?.label || RATIO_NORMAL;
+    $.ratio.querySelector('.ratio-value').textContent = defaultLabel;
     showRecentIfAvailable();
   }
 
-  // ================= 12. 初始化 =================
-  function hideTip() { if ($.searchTip) $.searchTip.classList.add('hidden'); }
+  // ================= 13. 自动触发查询（可选） =================
+  function setupAutoQuery() {
+    let timer = null;
+    function tryAutoQuery() {
+      clearFormErrors();
+      hideError();
+      const state = getInputState();
+      if (state.province && state.city && state.district && state.series && isValidCount(state.count)) {
+        handleQuery();
+      }
+    }
+    function debounceQuery() {
+      clearTimeout(timer);
+      timer = setTimeout(tryAutoQuery, 500);
+    }
+    $.count.addEventListener('input', debounceQuery);
+    $.series.addEventListener('change', debounceQuery);
+  }
 
+  // ================= 12. 初始化 =================
   function cascadeChange(lv) {
     handleCascade(lv);
     const p = $.province.value, c = $.city.value, d = $.district.value;
@@ -828,7 +861,6 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
       }
     });
     $.searchInput.addEventListener('focus', function () {
-      hideTip();
       const q = this.value.trim();
       if (q) { renderSearchResults(searchDistricts(q), q); }
       else { showRecentIfAvailable(); }
@@ -843,8 +875,8 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
       const isVisible = $.cascadingWrap.classList.toggle('visible');
       this.classList.toggle('expanded');
       this.innerHTML = isVisible
-        ? '收起地区选择 <span class="expand-arrow">⌵</span>'
-        : '或展开地区选择 <span class="expand-arrow">⌵</span>';
+        ? '收起地区选择 <span class="expand-arrow">▼</span>'
+        : '展开地区选择 <span class="expand-arrow">▼</span>';
     });
     $.recentClear.addEventListener('click', clearRecentAll);
     $.recentList.addEventListener('click', function (e) {
@@ -878,11 +910,15 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
   function init() {
     cacheDom();
     Object.keys(PROVINCE_CITY_DISTRICT).sort().forEach(p => $.province.add(new Option(p, p)));
-    RATIO_OPTIONS.forEach(o => $.ratio.add(new Option(o.label, o.value)));
+    // 容配比初始化（文本展示模式）
+    const initialRatio = RATIO_OPTIONS.find(o => o.value === RATIO_NORMAL)?.label || RATIO_NORMAL;
+    $.ratio.dataset.value = RATIO_NORMAL;
+    $.ratio.querySelector('.ratio-value').textContent = initialRatio;
     setupCascade();
     setupSearch();
     setupMisc();
     setupActions();
+    setupAutoQuery();
     if (typeof REGION_DB === 'undefined' || !REGION_DB) showDataLoadError();
     handleCascade('init');
     showRecentIfAvailable();
