@@ -277,6 +277,20 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
       { r: [61, 63], inv: "17+30", box: 50 }
     ]
   };
+  const ZHANGJIAJIE_DB = {
+    "1.2倍(正常)": [
+      { r: [65, 72], inv: "20+25", box: 50 },
+      { r: [73, 76], inv: "50", box: 50 }
+    ],
+    "1.1倍": [
+      { r: [60, 66], inv: "20+25", box: 50 },
+      { r: [67, 69], inv: "50", box: 50 }
+    ],
+    "1倍": [
+      { r: [55, 60], inv: "20+25", box: 50 },
+      { r: [61, 63], inv: "50", box: 50 }
+    ]
+  };
   const CABLE_THRESHOLDS = [
     { limit: 20, cu: "3×10+2×6 mm²", al: "3×16+1×10 mm²" },
     { limit: 33, cu: "3×16+2×10 mm²", al: "3×25+1×10 mm²" },
@@ -341,13 +355,21 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
   // ================= 7. 纯数据查询（无 DOM 调用） =================
   function lookupMatch(state) {
     let match = null;
-    // ① 湖南优先查专用配置（含标准表未覆盖的中间挡位）
-    if (state.province === PROV_HUNAN && HUNAN_DB[state.ratio]) {
+    // ① 张家界优先查专项配置（42kW→45kW合并，47kW→50kW替换）
+    const isZhangjiajie = state.province === PROV_HUNAN && state.city === '张家界市'
+      && state.district && ['永定区', '武陵源区', '慈利县', '桑植县'].includes(state.district);
+    if (isZhangjiajie && ZHANGJIAJIE_DB[state.ratio]) {
+      for (const row of ZHANGJIAJIE_DB[state.ratio]) {
+        if (state.count >= row.r[0] && state.count <= row.r[1]) { match = row; break; }
+      }
+    }
+    // ② 湖南其他地区查专用配置（含标准表未覆盖的中间挡位）
+    if (!match && state.province === PROV_HUNAN && HUNAN_DB[state.ratio]) {
       for (const row of HUNAN_DB[state.ratio]) {
         if (state.count >= row.r[0] && state.count <= row.r[1]) { match = row; break; }
       }
     }
-    // ② 未命中且系列为 730 时，查标准 NEG21_730 表（湖南专用配置未覆盖的数量段落至此）
+    // ③ 未命中且系列为 730 时，查标准 NEG21_730 表（湖南专用配置未覆盖的数量段落至此）
     if (!match && state.series === 'NEG21_730') {
       for (const row of DB.NEG21_730[state.ratio]) {
         if (state.count >= row.r[0] && state.count <= row.r[1]) { match = row; break; }
@@ -633,7 +655,6 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
 
   // ================= 11. 查询与事件处理 =================
   function handleQuery() {
-    if ($.queryBtn.classList.contains('success')) return;
     hideError();
     hideResult();
     clearFormErrors();
@@ -667,7 +688,7 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
     $.queryBtn.classList.remove('loading');
     $.queryBtn.classList.add('success');
     $.queryBtn.textContent = '✓ 查询完成';
-    setTimeout(() => { $.queryBtn.classList.remove('success'); $.queryBtn.textContent = '智能匹配查询'; }, 3000);
+    setTimeout(() => { $.queryBtn.classList.remove('success'); $.queryBtn.textContent = '智能匹配查询'; }, 500);
   }
 
   function handleCascade(lv, presetP, presetC, presetD) {
@@ -740,6 +761,7 @@ NEG22_800:{"1.2倍(正常)":[{r:[10,12],inv:"8",box:25},{r:[13,15],inv:"10",box:
     const text = [
       '【组件逆变器-线缆匹配查询结果】',
       '',
+      '• 容配比：' + $.ratio.querySelector('.ratio-value').textContent.trim(),
       '• 逆变器配置：' + $.resInv.textContent.trim(),
       '• 逆变器交流铜线：\n  - ' + extractLines($.resCu),
       '• 并网箱配置：' + $.resBox.textContent.trim(),
